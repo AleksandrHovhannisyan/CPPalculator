@@ -1,0 +1,6 @@
+*.Debug
+*.Release
+release
+debug
+*.qmake.stash
+*.rc
