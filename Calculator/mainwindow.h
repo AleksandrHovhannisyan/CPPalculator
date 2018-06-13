@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include <QLabel>
 
-// TODO create a signal named "outputIsReady"
+// TODO create a signal named "inputIsReady"
 // that is emitted when the = button is released
 // and is connected to calculator.h's slot for
 // handling parsing and all that
@@ -27,12 +27,16 @@ public:
 private:
     Ui::MainWindow *ui;
     bool decimalHasBeenAdded;
-    QLabel *output;
+    QLabel *input;
+
+signals:
+    void input_is_ready(QString input);
 
 private slots:
     void on_digit_released();
     void on_buttonDecimalPoint_released();
     void on_unary_button_released();
+    void on_buttonEquals_released();
 };
 
 #endif // MAINWINDOW_H

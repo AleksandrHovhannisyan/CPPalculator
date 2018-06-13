@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     decimalHasBeenAdded = false;
-    output = ui->labelOutput;
+    input = ui->labelInput;
 
     // Plug digit buttons' released() signals into MainWindow's on_digit_released() slot
     connect(ui->button0, SIGNAL(released()), this, SLOT(on_digit_released()));
@@ -32,25 +32,25 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/* When a digit button is pressed, its text gets relayed to output label */
+/* When a digit button is pressed, its text gets relayed to input label */
 void MainWindow::on_digit_released()
 {
     QPushButton *button = (QPushButton*)sender();
-    output->setText(QString::number(
-                                 output->text().append(
+    input->setText(QString::number(
+                                 input->text().append(
                                      button->text()
                                      ).toDouble(), 'g', 15)
                              );
 }
 
 /* When the decimal point button is released, add a decimal point to
- * output label if we haven't done so already (see decimalHasBeenAdded).
+ * input label if we haven't done so already (see decimalHasBeenAdded).
 */
 void MainWindow::on_buttonDecimalPoint_released()
 {
     if(!decimalHasBeenAdded)
     {
-        output->setText(output->text() + ".");
+        input->setText(input->text() + ".");
         decimalHasBeenAdded = true;
     }
 }
@@ -63,20 +63,30 @@ void MainWindow::on_unary_button_released()
 
     if(button->text() == "+/-")
     {
-        if(output->text().at(0) == '-')
+        if(input->text().at(0) == '-')
         {
-            output->setText(output->text().replace(0, 1, ""));
+            input->setText(input->text().replace(0, 1, ""));
         }
         else
         {
-            output->setText(output->text().prepend("-"));
+            input->setText(input->text().prepend("-"));
         }
     }
     else if(button->text() == "%")
     {
-        // TODO should only be applied to a number, so check if output contains anything but digits, ., or -
-        double number = output->text().toDouble();
+        // TODO should only be applied to a number, so check if input contains anything but digits, ., or -
+        double number = input->text().toDouble();
         number /= 100;
-        output->setText(QString::number(number, 'g', 15));
+        input->setText(QString::number(number, 'g', 15));
     }
+}
+
+/* If the user releases the = button, then they want
+ * the answer to their input to be calculated.
+ * Emits input_is_ready signal to give Calculator
+ * the input it needs to do its job.
+ */
+void MainWindow::on_buttonEquals_released()
+{
+    emit input_is_ready(input->text());
 }

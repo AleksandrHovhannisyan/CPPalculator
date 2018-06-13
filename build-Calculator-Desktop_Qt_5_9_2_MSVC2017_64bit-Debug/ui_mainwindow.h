@@ -45,7 +45,7 @@ public:
     QPushButton *buttonPercent;
     QPushButton *buttonSquared;
     QPushButton *buttonBack;
-    QLabel *labelOutput;
+    QLabel *labelInput;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -143,18 +143,18 @@ public:
         buttonBack->setObjectName(QStringLiteral("buttonBack"));
         buttonBack->setGeometry(QRect(210, 150, 91, 51));
         buttonBack->setFont(font);
-        labelOutput = new QLabel(centralWidget);
-        labelOutput->setObjectName(QStringLiteral("labelOutput"));
-        labelOutput->setGeometry(QRect(14, 70, 381, 41));
+        labelInput = new QLabel(centralWidget);
+        labelInput->setObjectName(QStringLiteral("labelInput"));
+        labelInput->setGeometry(QRect(14, 70, 381, 41));
         QFont font1;
         font1.setPointSize(28);
-        labelOutput->setFont(font1);
-        labelOutput->setLayoutDirection(Qt::LeftToRight);
-        labelOutput->setStyleSheet(QLatin1String("QLabel {\n"
+        labelInput->setFont(font1);
+        labelInput->setLayoutDirection(Qt::LeftToRight);
+        labelInput->setStyleSheet(QLatin1String("QLabel {\n"
 "	border: solid;\n"
 "	border-color: rgb(0, 0, 0)\n"
 "}"));
-        labelOutput->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        labelInput->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         MainWindow->setCentralWidget(centralWidget);
 
         retranslateUi(MainWindow);
@@ -185,7 +185,7 @@ public:
         buttonPercent->setText(QApplication::translate("MainWindow", "%", Q_NULLPTR));
         buttonSquared->setText(QApplication::translate("MainWindow", "x^2", Q_NULLPTR));
         buttonBack->setText(QApplication::translate("MainWindow", "Del", Q_NULLPTR));
-        labelOutput->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
+        labelInput->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
     } // retranslateUi
 
 };
