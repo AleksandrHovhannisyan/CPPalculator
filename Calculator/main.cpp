@@ -7,8 +7,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     MainWindow window;
     Calculator calculator;
-    // QObject::connect(sender, SIGNAL(signalEmitted()),
-    //                  receiver, SLOT(onSignalEmitted());
+    // MainWindow signals Calculator when input is ready for processing
     QObject::connect(&window, SIGNAL(input_is_ready(QString)),
                      &calculator, SLOT(on_input_given(QString)));
     window.show();

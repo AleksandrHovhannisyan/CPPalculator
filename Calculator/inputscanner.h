@@ -12,7 +12,7 @@ private:
     QStringList tokens;
 
 public:
-    QStringList parseInput(QString userInput);
+    QStringList scanInput(QString userInput);
 };
 
 #endif // INPUTSCANNER_H

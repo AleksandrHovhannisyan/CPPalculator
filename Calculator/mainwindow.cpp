@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     decimalHasBeenAdded = false;
     input = ui->labelInput;
 
-    // Plug digit buttons' released() signals into MainWindow's on_digit_released() slot
+    // Connect digits' released() signals to on_digit_released
     connect(ui->button0, SIGNAL(released()), this, SLOT(on_digit_released()));
     connect(ui->button1, SIGNAL(released()), this, SLOT(on_digit_released()));
     connect(ui->button2, SIGNAL(released()), this, SLOT(on_digit_released()));
@@ -23,13 +23,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->button8, SIGNAL(released()), this, SLOT(on_digit_released()));
     connect(ui->button9, SIGNAL(released()), this, SLOT(on_digit_released()));
 
-    // Plug unary op buttons' released() signals into MainWindow's on_unary_button_released slot
-    connect(ui->buttonNegate, SIGNAL(released()), this, SLOT(on_unary_button_released()));
-    connect(ui->buttonPercent, SIGNAL(released()), this, SLOT(on_unary_button_released()));
+    // Connect unary operators' released() signals to on_unary_button_released
+    connect(ui->buttonNegate, SIGNAL(released()),
+            this, SLOT(on_unary_button_released()));
+    connect(ui->buttonPercent, SIGNAL(released()),
+            this, SLOT(on_unary_button_released()));
 
-    // Plug binary operator buttons' released() signals into MainWindow's on_binary_button_released slot
-    connect(ui->buttonPlus, SIGNAL(released()), this, SLOT(on_binary_button_released()));
-    connect(ui->buttonMinus, SIGNAL(released()), this, SLOT(on_binary_button_released()));
+    // Connect binary operators' released() signals to on_binary_button_released
+    connect(ui->buttonPlus, SIGNAL(released()),
+            this, SLOT(on_binary_button_released()));
+    connect(ui->buttonMinus, SIGNAL(released()),
+            this, SLOT(on_binary_button_released()));
 }
 
 MainWindow::~MainWindow()
@@ -42,7 +46,7 @@ void MainWindow::on_digit_released()
 {
     QPushButton *button = (QPushButton*)sender();
 
-    if(input->text().length() == 1 && input->text()[0] == '0' && button->text() != "0")
+    if(input->text().length() == 1 && input->text()[0] == '0')
     {
         input->setText(input->text().replace(0, 1, button->text()));
     }
@@ -89,7 +93,8 @@ void MainWindow::on_unary_button_released()
     }
     else if(button->text() == "%")
     {
-        // TODO should only be applied to a number, so check if input contains anything but digits, ., or -
+        // TODO should only be applied to a number
+        // check if input contains anything but digits/./-
         double number = input->text().toDouble();
         number /= 100;
         input->setText(QString::number(number, 'g', 15));
@@ -119,7 +124,7 @@ void MainWindow::on_buttonEquals_released()
     emit input_is_ready(input->text());
 }
 
-/* Pretty self-explanatory. Basically, if the user
+/* Pretty straightforward. Basically, if the user
  * presses and releases the clear button, then
  * set the input string to just 0.
  */

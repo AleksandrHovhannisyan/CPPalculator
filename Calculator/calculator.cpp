@@ -12,7 +12,9 @@ void Calculator::on_input_given(QString input)
     run();
 }
 
+/* Called as soon as input is ready for processing.
+ */
 void Calculator::run()
 {
-    QStringList tokens = parser.parseInput(input);
+    QStringList tokens = parser.scanInput(input);
 }

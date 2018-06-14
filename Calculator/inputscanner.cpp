@@ -1,7 +1,7 @@
 #include "inputscanner.h"
 
 /* Splits user-entered string into tokens with whitespace as delimiter. */
-QStringList InputScanner::parseInput(QString userInput)
+QStringList InputScanner::scanInput(QString userInput)
 {
     QStringList list = userInput.split(" ");
 
