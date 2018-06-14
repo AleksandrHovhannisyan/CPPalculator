@@ -44,7 +44,7 @@ public:
     QPushButton *buttonDivide;
     QPushButton *buttonPercent;
     QPushButton *buttonSquared;
-    QPushButton *buttonBack;
+    QPushButton *buttonClear;
     QLabel *labelInput;
 
     void setupUi(QMainWindow *MainWindow)
@@ -139,10 +139,10 @@ public:
         buttonSquared->setObjectName(QStringLiteral("buttonSquared"));
         buttonSquared->setGeometry(QRect(110, 150, 91, 51));
         buttonSquared->setFont(font);
-        buttonBack = new QPushButton(centralWidget);
-        buttonBack->setObjectName(QStringLiteral("buttonBack"));
-        buttonBack->setGeometry(QRect(210, 150, 91, 51));
-        buttonBack->setFont(font);
+        buttonClear = new QPushButton(centralWidget);
+        buttonClear->setObjectName(QStringLiteral("buttonClear"));
+        buttonClear->setGeometry(QRect(210, 150, 91, 51));
+        buttonClear->setFont(font);
         labelInput = new QLabel(centralWidget);
         labelInput->setObjectName(QStringLiteral("labelInput"));
         labelInput->setGeometry(QRect(14, 70, 381, 41));
@@ -184,7 +184,7 @@ public:
         buttonDivide->setText(QApplication::translate("MainWindow", "/", Q_NULLPTR));
         buttonPercent->setText(QApplication::translate("MainWindow", "%", Q_NULLPTR));
         buttonSquared->setText(QApplication::translate("MainWindow", "x^2", Q_NULLPTR));
-        buttonBack->setText(QApplication::translate("MainWindow", "Del", Q_NULLPTR));
+        buttonClear->setText(QApplication::translate("MainWindow", "C", Q_NULLPTR));
         labelInput->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
     } // retranslateUi
 

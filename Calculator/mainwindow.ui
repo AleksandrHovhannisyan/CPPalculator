@@ -374,7 +374,7 @@
      <string>x^2</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="buttonBack">
+   <widget class="QPushButton" name="buttonClear">
     <property name="geometry">
      <rect>
       <x>210</x>
@@ -389,7 +389,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Del</string>
+     <string>C</string>
     </property>
    </widget>
    <widget class="QLabel" name="labelInput">

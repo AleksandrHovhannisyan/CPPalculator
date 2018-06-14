@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    calculator.cpp
+    calculator.cpp \
+    inputscanner.cpp
 
 HEADERS += \
         mainwindow.h \
-    calculator.h
+    calculator.h \
+    inputscanner.h
 
 FORMS += \
         mainwindow.ui

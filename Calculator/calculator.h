@@ -4,17 +4,14 @@
 #include <mainwindow.h>
 #include <QObject>
 #include <QString>
-#include <QDebug>
-
-
-
+#include "inputscanner.h"
 
 class Calculator: public QObject
 {
     Q_OBJECT
 
 signals:
-    // TODO add a signal that indicates error was encountered
+    // TODO add another signal that indicates error was encountered
     // MainWindow should then clear its output label for a redo
     void output_is_ready(QString output);
 
@@ -28,6 +25,7 @@ public:
 private:
     QString input;
     QString output;
+    InputScanner parser;
 };
 
 

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QChar>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // Plug unary op buttons' released() signals into MainWindow's on_unary_button_released slot
     connect(ui->buttonNegate, SIGNAL(released()), this, SLOT(on_unary_button_released()));
     connect(ui->buttonPercent, SIGNAL(released()), this, SLOT(on_unary_button_released()));
+
+    // Plug binary operator buttons' released() signals into MainWindow's on_binary_button_released slot
+    connect(ui->buttonPlus, SIGNAL(released()), this, SLOT(on_binary_button_released()));
+    connect(ui->buttonMinus, SIGNAL(released()), this, SLOT(on_binary_button_released()));
 }
 
 MainWindow::~MainWindow()
@@ -36,11 +41,21 @@ MainWindow::~MainWindow()
 void MainWindow::on_digit_released()
 {
     QPushButton *button = (QPushButton*)sender();
-    input->setText(QString::number(
-                                 input->text().append(
-                                     button->text()
-                                     ).toDouble(), 'g', 15)
-                             );
+
+    if(input->text().length() == 1 && input->text()[0] == '0' && button->text() != "0")
+    {
+        input->setText(input->text().replace(0, 1, button->text()));
+    }
+    else
+    {
+        input->setText(input->text().append(button->text()));
+    }
+
+    //input->setText(QString::number(
+    //                                input->text().append(
+    //                                button->text()
+    //                                ).toDouble(), 'g', 15)
+    //                         );
 }
 
 /* When the decimal point button is released, add a decimal point to
@@ -81,6 +96,19 @@ void MainWindow::on_unary_button_released()
     }
 }
 
+/* If the user presses any binary operation's button, like
+ * plus, minus, multiply, or divide, this slot will be called
+ * to insert the appropriate operation into the current input.
+ */
+void MainWindow::on_binary_button_released()
+{
+    QPushButton *button = (QPushButton*)sender();
+
+    // TODO ensure that we don't do two + operations in row, for example...
+
+    input->setText(input->text().append(" " + button->text() + " "));
+}
+
 /* If the user releases the = button, then they want
  * the answer to their input to be calculated.
  * Emits input_is_ready signal to give Calculator
@@ -89,4 +117,13 @@ void MainWindow::on_unary_button_released()
 void MainWindow::on_buttonEquals_released()
 {
     emit input_is_ready(input->text());
+}
+
+/* Pretty self-explanatory. Basically, if the user
+ * presses and releases the clear button, then
+ * set the input string to just 0.
+ */
+void MainWindow::on_buttonClear_released()
+{
+    input->setText("0");
 }

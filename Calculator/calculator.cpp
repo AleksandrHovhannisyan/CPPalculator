@@ -1,5 +1,6 @@
 #include "calculator.h"
-
+#include <QDebug>
+#include <QstringList>
 
 /* MainWindow sends the input_is_ready() signal to
  * this slot to indicate that the user has provided
@@ -8,5 +9,10 @@
 void Calculator::on_input_given(QString input)
 {
     this->input = input;
-    qDebug() << "Got the input! It's: " + input;
+    run();
+}
+
+void Calculator::run()
+{
+    QStringList tokens = parser.parseInput(input);
 }
