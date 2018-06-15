@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QChar>
 
+// TODO add parentheses operations to calculator
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -95,6 +97,7 @@ void MainWindow::on_unary_button_released()
             input->setText(input->text().prepend("-"));
         }
     }
+    // TODO get rid of % operation
     else if(button->text() == "%")
     {
         // TODO should only be applied to a number

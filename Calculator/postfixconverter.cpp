@@ -20,8 +20,10 @@ PostfixConverter::PostfixConverter()
 bool PostfixConverter::isInteger(QString token)
 {
     // Negative numbers
+    // TODO this is bad logic
     if(token.at(0) == '-' && token.length() > 1) { return true; }
 
+    // TODO isInteger should be isNumber and decimal supported
     for(int i = 0; i < token.length(); i++)
     {
         QChar currentCharacter = token.at(i);
@@ -48,7 +50,7 @@ void PostfixConverter::convertToPostfix(const QStringList& input)
         QString currentToken = input.at(index);
 
         // Token is an integer
-        // TODO "currentToken == "pi" || currentToken == "e" ||"
+        // TODO in the future, add "currentToken == "pi" || currentToken == "e" ||" to the check
         if(isInteger(currentToken))
         {
             output.push_back(currentToken);
@@ -56,10 +58,10 @@ void PostfixConverter::convertToPostfix(const QStringList& input)
         // Token is an operator
         else if(isOperator(currentToken))
         {
-            while( !operatorStack.empty() &&
-                   isOperator(operatorStack.top()) &&
+            while( !operatorStack.empty() && isOperator(operatorStack.top()) &&
                  ( (operators[currentToken].associativity == Left
-                    && operators[currentToken].precedence <= operators[operatorStack.top()].precedence)
+                    && operators[currentToken].precedence <=
+                    operators[operatorStack.top()].precedence)
                     ||
                     (operators[currentToken].associativity == Right
                     && operators[currentToken].precedence < operators[operatorStack.top()].precedence)

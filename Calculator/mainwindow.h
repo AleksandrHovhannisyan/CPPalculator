@@ -5,11 +5,6 @@
 #include <QPushButton>
 #include <QLabel>
 
-// TODO create a signal named "inputIsReady"
-// that is emitted when the = button is released
-// and is connected to calculator.h's slot for
-// handling parsing and all that
-
 
 namespace Ui {
 class MainWindow;
