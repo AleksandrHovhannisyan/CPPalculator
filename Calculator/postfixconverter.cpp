@@ -1,0 +1,116 @@
+#include "postfixconverter.h"
+#include <QStack>
+#include <QChar>
+
+
+PostfixConverter::PostfixConverter()
+{
+    failedToConvert = false;
+    Operator plus(Left, 1);
+    Operator minus(Left, 1);
+    Operator times(Left, 2);
+    Operator divide(Left, 2);
+    operators["+"] = plus;
+    operators["-"] = minus;
+    operators["x"] = times;
+    operators["/"] = divide;
+}
+
+/* Private helper. Checks if a token represents an integer.*/
+bool PostfixConverter::isInteger(QString token)
+{
+    // Negative numbers
+    if(token.at(0) == '-' && token.length() > 1) { return true; }
+
+    for(int i = 0; i < token.length(); i++)
+    {
+        QChar currentCharacter = token.at(i);
+        if(!currentCharacter.isDigit()) { return false; }
+    }
+
+    return true;
+}
+
+/* Parses an infix mathematical expression to postfix notation
+ * using the Shunting-yard algorithm.
+ */
+void PostfixConverter::convertToPostfix(const QStringList& input)
+{
+    // Allows for reusability of the converter
+    output.clear();
+    failedToConvert = false;
+
+    // Note: operatorStack may contain parentheses, which are NOT operators
+    QStack<QString> operatorStack;
+
+    for(int index = 0; index < input.size(); index++)
+    {
+        QString currentToken = input.at(index);
+
+        // Token is an integer
+        // TODO "currentToken == "pi" || currentToken == "e" ||"
+        if(isInteger(currentToken))
+        {
+            output.push_back(currentToken);
+        }
+        // Token is an operator
+        else if(isOperator(currentToken))
+        {
+            while( !operatorStack.empty() &&
+                   isOperator(operatorStack.top()) &&
+                 ( (operators[currentToken].associativity == Left
+                    && operators[currentToken].precedence <= operators[operatorStack.top()].precedence)
+                    ||
+                    (operators[currentToken].associativity == Right
+                    && operators[currentToken].precedence < operators[operatorStack.top()].precedence)
+                 )
+                 )
+            {
+                popOperator(operatorStack);
+            }
+
+            operatorStack.push(currentToken);
+        }
+        // Token is left parenthesis
+        else if(currentToken == "(")
+        {
+            operatorStack.push(currentToken);
+        }
+        // Token is right parenthesis
+        else if(currentToken == ")")
+        {
+            while(operatorStack.top() != "(")
+            {
+                popOperator(operatorStack);
+            }
+
+            operatorStack.pop();
+        }
+        // Token is invalid if none of the above were true
+        else
+        {
+            failedToConvert = true;
+            return;
+        }
+    }
+
+    // Final emptying
+    while( !operatorStack.empty() && isOperator(operatorStack.top()) )
+    {
+        popOperator(operatorStack);
+    }
+
+    // If even number of tokens, expression must be something like 1+
+    if(output.size() % 2 == 0)
+    {
+        failedToConvert = true;
+        return;
+    }
+}
+
+/* A fairly common operation. See @convertToPostfix. */
+void PostfixConverter::popOperator(QStack<QString>& operatorStack)
+{
+    output.push_back(operatorStack.top());
+    operatorStack.pop();
+}

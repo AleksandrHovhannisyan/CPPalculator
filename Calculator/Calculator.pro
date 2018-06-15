@@ -27,12 +27,12 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     calculator.cpp \
-    inputscanner.cpp
+    postfixconverter.cpp
 
 HEADERS += \
         mainwindow.h \
     calculator.h \
-    inputscanner.h
+    postfixconverter.h
 
 FORMS += \
         mainwindow.ui

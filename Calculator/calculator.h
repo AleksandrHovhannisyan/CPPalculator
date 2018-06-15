@@ -4,7 +4,7 @@
 #include <mainwindow.h>
 #include <QObject>
 #include <QString>
-#include "inputscanner.h"
+#include "postfixconverter.h"
 
 class Calculator: public QObject
 {
@@ -25,7 +25,7 @@ public:
 private:
     QString input;
     QString output;
-    InputScanner parser;
+    PostfixConverter postfixConverter;
 };
 
 

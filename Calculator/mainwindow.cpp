@@ -34,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_binary_button_released()));
     connect(ui->buttonMinus, SIGNAL(released()),
             this, SLOT(on_binary_button_released()));
+    connect(ui->buttonTimes, SIGNAL(released()),
+            this, SLOT(on_binary_button_released()));
+    connect(ui->buttonDivide, SIGNAL(released()),
+            this, SLOT(on_binary_button_released()));
 }
 
 MainWindow::~MainWindow()

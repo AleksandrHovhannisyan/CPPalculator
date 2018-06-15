@@ -13,8 +13,26 @@ void Calculator::on_input_given(QString input)
 }
 
 /* Called as soon as input is ready for processing.
+ * Extracts each individual token from the input
+ * string and stores it in a QStringList.
  */
 void Calculator::run()
 {
-    QStringList tokens = parser.scanInput(input);
+    QStringList tokens = input.split(" ", QString::SkipEmptyParts);
+
+    /* // Don't you just love debugging...
+    for(QStringList::Iterator it = tokens.begin(); it != tokens.end(); ++it)
+    {
+        qDebug() << (*it);
+    }
+    */
+
+    postfixConverter.convertToPostfix(tokens);
+    QStringList postfix = postfixConverter.getOutput();
+
+     // More debugging!
+    for(QStringList::Iterator it = postfix.begin(); it != postfix.end(); ++it)
+    {
+        qDebug() << (*it);
+    }
 }
