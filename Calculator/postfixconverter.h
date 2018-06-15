@@ -23,7 +23,7 @@ private:
     QStringList output;
     bool failedToConvert;
 
-    bool isInteger(QString token);
+    bool isNumber(QString token);
     bool isOperator(QString token){ return operators.count(token) == 1; }
     void popOperator(QStack<QString>& operatorStack);
 };

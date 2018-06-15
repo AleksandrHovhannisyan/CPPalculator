@@ -299,7 +299,7 @@
      </font>
     </property>
     <property name="text">
-     <string>-</string>
+     <string>–</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonTimes">
@@ -371,7 +371,7 @@
      </font>
     </property>
     <property name="text">
-     <string>x^2</string>
+     <string>^</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonClear">

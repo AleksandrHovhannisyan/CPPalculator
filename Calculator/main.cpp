@@ -15,7 +15,7 @@ void setUpOperators()
     Operator times(Left, 2);
     Operator divide(Left, 2);
     operators["+"] = plus;
-    operators["-"] = minus;
+    operators["–"] = minus;
     operators["×"] = times;
     operators["÷"] = divide;
 }

@@ -7,18 +7,18 @@ PostfixConverter::PostfixConverter()
     failedToConvert = false;
 }
 
+// TODO change isNumber to isNumber
 /* Private helper. Checks if a token represents an integer.*/
-bool PostfixConverter::isInteger(QString token)
+bool PostfixConverter::isNumber(QString token)
 {
     // Negative numbers
-    // TODO this is bad logic
     if(token.at(0) == '-' && token.length() > 1) { return true; }
 
-    // TODO isInteger should be isNumber and decimal supported
+    // TODO isNumber should be isNumber and decimal supported
     for(int i = 0; i < token.length(); i++)
     {
         QChar currentCharacter = token.at(i);
-        if(!currentCharacter.isDigit()) { return false; }
+        if(!currentCharacter.isDigit() && currentCharacter != '.') { return false; }
     }
 
     return true;
@@ -42,7 +42,7 @@ void PostfixConverter::convertToPostfix(const QStringList& input)
 
         // Token is an integer
         // TODO in the future, add "currentToken == "pi" || currentToken == "e" ||" to the check
-        if(isInteger(currentToken))
+        if(isNumber(currentToken))
         {
             output.push_back(currentToken);
         }
