@@ -180,8 +180,8 @@ public:
         buttonEquals->setText(QApplication::translate("MainWindow", "=", Q_NULLPTR));
         buttonPlus->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
         buttonMinus->setText(QApplication::translate("MainWindow", "-", Q_NULLPTR));
-        buttonTimes->setText(QApplication::translate("MainWindow", "x", Q_NULLPTR));
-        buttonDivide->setText(QApplication::translate("MainWindow", "/", Q_NULLPTR));
+        buttonTimes->setText(QApplication::translate("MainWindow", "\303\227", Q_NULLPTR));
+        buttonDivide->setText(QApplication::translate("MainWindow", "\303\267", Q_NULLPTR));
         buttonPercent->setText(QApplication::translate("MainWindow", "%", Q_NULLPTR));
         buttonSquared->setText(QApplication::translate("MainWindow", "x^2", Q_NULLPTR));
         buttonClear->setText(QApplication::translate("MainWindow", "C", Q_NULLPTR));

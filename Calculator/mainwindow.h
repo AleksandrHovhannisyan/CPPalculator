@@ -23,6 +23,7 @@ private:
     Ui::MainWindow *ui;
     bool decimalHasBeenAdded;
     QLabel *input;
+    bool operatorUsedDirectlyBefore() const;
 
 signals:
     void input_is_ready(QString input);

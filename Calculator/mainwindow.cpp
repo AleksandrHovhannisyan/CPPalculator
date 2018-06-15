@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "operator.h"
 #include <QDebug>
 #include <QChar>
 
@@ -47,6 +48,22 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+/* Used by other functions when checking if an operator was
+ * already applied directly before the current attempt at
+ * either evaluating the expression or adding a new operator.
+ */
+bool MainWindow::operatorUsedDirectlyBefore() const
+{
+    if(input->text().length() >= 2)
+    {
+        // Operators have a space after (e.g., " + "). Hence length()-2.
+        // If input is like "1 + 2", return false b/c " " is not operator.
+        return ((bool)operators.count(input->text().at(input->text().length()-2)));
+    }
+    return false;
+}
+
+
 /* When a digit button is pressed, its text gets relayed to input label */
 void MainWindow::on_digit_released()
 {
@@ -73,6 +90,7 @@ void MainWindow::on_digit_released()
 */
 void MainWindow::on_buttonDecimalPoint_released()
 {
+    // TODO needs to be changed or maybe removed altogether
     if(!decimalHasBeenAdded)
     {
         input->setText(input->text() + ".");
@@ -116,9 +134,10 @@ void MainWindow::on_binary_button_released()
 {
     QPushButton *button = (QPushButton*)sender();
 
-    // TODO ensure that we don't do two + operations in row, for example...
-
-    input->setText(input->text().append(" " + button->text() + " "));
+    if(!operatorUsedDirectlyBefore())
+    {
+        input->setText(input->text().append(" " + button->text() + " "));
+    }
 }
 
 /* If the user releases the = button, then they want
@@ -128,7 +147,10 @@ void MainWindow::on_binary_button_released()
  */
 void MainWindow::on_buttonEquals_released()
 {
-    emit input_is_ready(input->text());
+    if(!operatorUsedDirectlyBefore())
+    {
+        emit input_is_ready(input->text());
+    }
 }
 
 /* Pretty straightforward. Basically, if the user

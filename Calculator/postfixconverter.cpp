@@ -2,18 +2,9 @@
 #include <QStack>
 #include <QChar>
 
-
 PostfixConverter::PostfixConverter()
 {
     failedToConvert = false;
-    Operator plus(Left, 1);
-    Operator minus(Left, 1);
-    Operator times(Left, 2);
-    Operator divide(Left, 2);
-    operators["+"] = plus;
-    operators["-"] = minus;
-    operators["x"] = times;
-    operators["/"] = divide;
 }
 
 /* Private helper. Checks if a token represents an integer.*/
@@ -100,13 +91,6 @@ void PostfixConverter::convertToPostfix(const QStringList& input)
     while( !operatorStack.empty() && isOperator(operatorStack.top()) )
     {
         popOperator(operatorStack);
-    }
-
-    // If even number of tokens, expression must be something like 1+
-    if(output.size() % 2 == 0)
-    {
-        failedToConvert = true;
-        return;
     }
 }
 

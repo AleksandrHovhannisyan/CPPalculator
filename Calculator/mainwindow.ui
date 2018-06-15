@@ -317,7 +317,7 @@
      </font>
     </property>
     <property name="text">
-     <string>x</string>
+     <string>×</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonDivide">
@@ -335,7 +335,7 @@
      </font>
     </property>
     <property name="text">
-     <string>/</string>
+     <string>÷</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonPercent">

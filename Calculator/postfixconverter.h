@@ -9,21 +9,7 @@
 #include <QString>
 #include <QMap>
 #include <QStringList>
-
-
-enum Associativity
-{
-    Left,
-    Right
-};
-
-struct Operator
-{
-    Associativity associativity;
-    int precedence;
-    Operator(Associativity a,int p) : associativity(a), precedence(p) {}
-    Operator() : Operator(Left, 1) {}
-};
+#include "operator.h"
 
 class PostfixConverter
 {
@@ -36,7 +22,6 @@ public:
 private:
     QStringList output;
     bool failedToConvert;
-    QMap<QString, Operator> operators;
 
     bool isInteger(QString token);
     bool isOperator(QString token){ return operators.count(token) == 1; }

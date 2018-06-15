@@ -32,7 +32,8 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
     calculator.h \
-    postfixconverter.h
+    postfixconverter.h \
+    operator.h
 
 FORMS += \
         mainwindow.ui
