@@ -26,12 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->button8, SIGNAL(released()), this, SLOT(on_digit_released()));
     connect(ui->button9, SIGNAL(released()), this, SLOT(on_digit_released()));
 
-    // Connect unary operators' released() signals to on_unary_button_released
-    connect(ui->buttonNegate, SIGNAL(released()),
-            this, SLOT(on_unary_button_released()));
-    connect(ui->buttonPercent, SIGNAL(released()),
-            this, SLOT(on_unary_button_released()));
-
     // Connect binary operators' released() signals to on_binary_button_released
     connect(ui->buttonPlus, SIGNAL(released()),
             this, SLOT(on_binary_button_released()));
@@ -77,7 +71,6 @@ void MainWindow::on_digit_released()
     {
         input->setText(input->text().append(button->text()));
     }
-
     //input->setText(QString::number(
     //                                input->text().append(
     //                                button->text()
@@ -90,39 +83,62 @@ void MainWindow::on_digit_released()
 */
 void MainWindow::on_buttonDecimalPoint_released()
 {
-    // TODO needs to be changed or maybe removed altogether
-    if(!decimalHasBeenAdded)
+    // TODO prevent entry of multiple decimal points
+    if(!operatorUsedDirectlyBefore())
     {
         input->setText(input->text() + ".");
-        decimalHasBeenAdded = true;
     }
 }
 
-/* Unary operations are +/- and percent (%)
-*/
-void MainWindow::on_unary_button_released()
+/* Handles functionality of negating an input expression.
+ * Negating an expression applies the negative sign to the
+ * last number entered (if one exists). Negating a
+ * negative number will remove the negative sign.
+ */
+void MainWindow::on_buttonNegate_released()
 {
-    QPushButton *button = (QPushButton*)sender();
+    if(operatorUsedDirectlyBefore()){ return; }
 
-    if(button->text() == "+/-")
+    // Check if there are currently any operators in input
+    bool inputHasOperators = false;
+    for(int i = 0; i < input->text().length(); i++)
     {
-        if(input->text().at(0) == '-')
+        if(operators.count(input->text().at(i)) == 1)
         {
-            input->setText(input->text().replace(0, 1, ""));
-        }
-        else
-        {
-            input->setText(input->text().prepend("-"));
+            inputHasOperators = true;
+            break;
         }
     }
-    // TODO get rid of % operation
-    else if(button->text() == "%")
+
+    // Input expression contains operators
+    if(inputHasOperators)
     {
-        // TODO should only be applied to a number
-        // check if input contains anything but digits/./-
-        double number = input->text().toDouble();
-        number /= 100;
-        input->setText(QString::number(number, 'g', 15));
+        int indexOfLastWhitespace = input->text().lastIndexOf(' ');
+
+        // If the number is negative and part of an expression w/ ops
+        if(input->text().at(indexOfLastWhitespace+1) == '-')
+        {
+            input->setText(input->text().replace(indexOfLastWhitespace+1, 1, ""));
+        }
+
+        // Otherwise, just a positive number part of an expression w/ ops
+        else
+        {
+            input->setText(input->text().insert(indexOfLastWhitespace+1, '-'));
+        }
+    }
+
+    // TODO or parenthetical expression?
+    // No operators and already negative number
+    else if(input->text().at(0) == '-')
+    {
+        input->setText(input->text().replace(0, 1, ""));
+    }
+
+    // No operators and positive number
+    else
+    {
+        input->setText(input->text().prepend("-"));
     }
 }
 
@@ -160,4 +176,8 @@ void MainWindow::on_buttonEquals_released()
 void MainWindow::on_buttonClear_released()
 {
     input->setText("0");
+}
+
+void MainWindow::on_buttonRoot_released()
+{
 }

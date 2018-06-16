@@ -7,14 +7,13 @@ PostfixConverter::PostfixConverter()
     failedToConvert = false;
 }
 
-// TODO change isNumber to isNumber
 /* Private helper. Checks if a token represents an integer.*/
 bool PostfixConverter::isNumber(QString token)
 {
     // Negative numbers
     if(token.at(0) == '-' && token.length() > 1) { return true; }
 
-    // TODO isNumber should be isNumber and decimal supported
+    // All others
     for(int i = 0; i < token.length(); i++)
     {
         QChar currentCharacter = token.at(i);

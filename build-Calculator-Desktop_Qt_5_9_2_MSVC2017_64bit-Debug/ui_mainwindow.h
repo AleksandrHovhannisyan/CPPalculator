@@ -36,16 +36,16 @@ public:
     QPushButton *button7;
     QPushButton *button8;
     QPushButton *button9;
-    QPushButton *buttonNegate;
     QPushButton *buttonEquals;
     QPushButton *buttonPlus;
     QPushButton *buttonMinus;
     QPushButton *buttonTimes;
     QPushButton *buttonDivide;
-    QPushButton *buttonPercent;
+    QPushButton *buttonRoot;
     QPushButton *buttonSquared;
     QPushButton *buttonClear;
     QLabel *labelInput;
+    QPushButton *buttonNegate;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -107,10 +107,6 @@ public:
         button9->setObjectName(QStringLiteral("button9"));
         button9->setGeometry(QRect(210, 210, 91, 51));
         button9->setFont(font);
-        buttonNegate = new QPushButton(centralWidget);
-        buttonNegate->setObjectName(QStringLiteral("buttonNegate"));
-        buttonNegate->setGeometry(QRect(10, 390, 91, 51));
-        buttonNegate->setFont(font);
         buttonEquals = new QPushButton(centralWidget);
         buttonEquals->setObjectName(QStringLiteral("buttonEquals"));
         buttonEquals->setGeometry(QRect(310, 390, 91, 51));
@@ -131,10 +127,10 @@ public:
         buttonDivide->setObjectName(QStringLiteral("buttonDivide"));
         buttonDivide->setGeometry(QRect(310, 150, 91, 51));
         buttonDivide->setFont(font);
-        buttonPercent = new QPushButton(centralWidget);
-        buttonPercent->setObjectName(QStringLiteral("buttonPercent"));
-        buttonPercent->setGeometry(QRect(10, 150, 91, 51));
-        buttonPercent->setFont(font);
+        buttonRoot = new QPushButton(centralWidget);
+        buttonRoot->setObjectName(QStringLiteral("buttonRoot"));
+        buttonRoot->setGeometry(QRect(10, 150, 91, 51));
+        buttonRoot->setFont(font);
         buttonSquared = new QPushButton(centralWidget);
         buttonSquared->setObjectName(QStringLiteral("buttonSquared"));
         buttonSquared->setGeometry(QRect(110, 150, 91, 51));
@@ -155,6 +151,10 @@ public:
 "	border-color: rgb(0, 0, 0)\n"
 "}"));
         labelInput->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        buttonNegate = new QPushButton(centralWidget);
+        buttonNegate->setObjectName(QStringLiteral("buttonNegate"));
+        buttonNegate->setGeometry(QRect(10, 390, 91, 51));
+        buttonNegate->setFont(font);
         MainWindow->setCentralWidget(centralWidget);
 
         retranslateUi(MainWindow);
@@ -176,16 +176,16 @@ public:
         button7->setText(QApplication::translate("MainWindow", "7", Q_NULLPTR));
         button8->setText(QApplication::translate("MainWindow", "8", Q_NULLPTR));
         button9->setText(QApplication::translate("MainWindow", "9", Q_NULLPTR));
-        buttonNegate->setText(QApplication::translate("MainWindow", "+/-", Q_NULLPTR));
         buttonEquals->setText(QApplication::translate("MainWindow", "=", Q_NULLPTR));
         buttonPlus->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
         buttonMinus->setText(QApplication::translate("MainWindow", "\342\200\223", Q_NULLPTR));
         buttonTimes->setText(QApplication::translate("MainWindow", "\303\227", Q_NULLPTR));
         buttonDivide->setText(QApplication::translate("MainWindow", "\303\267", Q_NULLPTR));
-        buttonPercent->setText(QApplication::translate("MainWindow", "%", Q_NULLPTR));
+        buttonRoot->setText(QApplication::translate("MainWindow", "rt", Q_NULLPTR));
         buttonSquared->setText(QApplication::translate("MainWindow", "^", Q_NULLPTR));
         buttonClear->setText(QApplication::translate("MainWindow", "C", Q_NULLPTR));
         labelInput->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
+        buttonNegate->setText(QApplication::translate("MainWindow", "\302\261", Q_NULLPTR));
     } // retranslateUi
 
 };
