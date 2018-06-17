@@ -3,6 +3,8 @@
 #include "operator.h"
 #include <QDebug>
 #include <QChar>
+#include <QShortcut>
+#include <QKeySequence>
 
 // TODO add parentheses operations to calculator
 
@@ -10,9 +12,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // Basic variable setups
     ui->setupUi(this);
-    decimalHasBeenAdded = false;
     input = ui->labelInput;
+    digitAllowed = true;
+    operatorAllowed = true;
+    openParenthAllowed = false;
+    closingParenthAllowed = false;
+    numOpenParenths = 0;
+    numClosingParenths = 0;
 
     // Connect digits' released() signals to on_digit_released
     connect(ui->button0, SIGNAL(released()), this, SLOT(on_digit_released()));
@@ -35,6 +43,45 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_binary_button_released()));
     connect(ui->buttonDivide, SIGNAL(released()),
             this, SLOT(on_binary_button_released()));
+
+    // Shortcuts for math input via keyboard
+    // TODO potential memory leaks
+    QShortcut *shortcut0 = new QShortcut(QKeySequence("0"), this);
+    QShortcut *shortcut1 = new QShortcut(QKeySequence("1"), this);
+    QShortcut *shortcut2 = new QShortcut(QKeySequence("2"), this);
+    QShortcut *shortcut3 = new QShortcut(QKeySequence("3"), this);
+    QShortcut *shortcut4 = new QShortcut(QKeySequence("4"), this);
+    QShortcut *shortcut5 = new QShortcut(QKeySequence("5"), this);
+    QShortcut *shortcut6 = new QShortcut(QKeySequence("6"), this);
+    QShortcut *shortcut7 = new QShortcut(QKeySequence("7"), this);
+    QShortcut *shortcut8 = new QShortcut(QKeySequence("8"), this);
+    QShortcut *shortcut9 = new QShortcut(QKeySequence("9"), this);
+    QShortcut *shortcutDecimal = new QShortcut(QKeySequence("."), this);
+    QShortcut *shortcutPlus = new QShortcut(QKeySequence("+"), this);
+    QShortcut *shortcutMinus = new QShortcut(QKeySequence("-"), this);
+    QShortcut *shortcutTimes = new QShortcut(QKeySequence("SHIFT+8"), this);
+    QShortcut *shortcutDivide = new QShortcut(QKeySequence("/"), this);
+    QShortcut *shortcutOpenParenth = new QShortcut(QKeySequence("SHIFT+9"), this);
+    QShortcut *shortcutCloseParenth = new QShortcut(QKeySequence("SHIFT+0"), this);
+    QShortcut *shortcutEnter = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    connect(shortcut0, SIGNAL(activated()), ui->button0, SLOT(click()));
+    connect(shortcut1, SIGNAL(activated()), ui->button1, SLOT(click()));
+    connect(shortcut2, SIGNAL(activated()), ui->button2, SLOT(click()));
+    connect(shortcut3, SIGNAL(activated()), ui->button3, SLOT(click()));
+    connect(shortcut4, SIGNAL(activated()), ui->button4, SLOT(click()));
+    connect(shortcut5, SIGNAL(activated()), ui->button5, SLOT(click()));
+    connect(shortcut6, SIGNAL(activated()), ui->button6, SLOT(click()));
+    connect(shortcut7, SIGNAL(activated()), ui->button7, SLOT(click()));
+    connect(shortcut8, SIGNAL(activated()), ui->button8, SLOT(click()));
+    connect(shortcut9, SIGNAL(activated()), ui->button9, SLOT(click()));
+    connect(shortcutDecimal, SIGNAL(activated()), ui->buttonDecimalPoint, SLOT(click()));
+    connect(shortcutPlus, SIGNAL(activated()), ui->buttonPlus, SLOT(click()));
+    connect(shortcutMinus, SIGNAL(activated()), ui->buttonMinus, SLOT(click()));
+    connect(shortcutTimes, SIGNAL(activated()), ui->buttonTimes, SLOT(click()));
+    connect(shortcutDivide, SIGNAL(activated()), ui->buttonDivide, SLOT(click()));
+    connect(shortcutOpenParenth, SIGNAL(activated()), ui->buttonOpenParenth, SLOT(click()));
+    connect(shortcutCloseParenth, SIGNAL(activated()), ui->buttonCloseParenth, SLOT(click()));
+    connect(shortcutEnter, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
 }
 
 MainWindow::~MainWindow()
@@ -61,21 +108,22 @@ bool MainWindow::operatorUsedDirectlyBefore() const
 /* When a digit button is pressed, its text gets relayed to input label */
 void MainWindow::on_digit_released()
 {
-    QPushButton *button = (QPushButton*)sender();
+    if(digitAllowed)
+    {
+        QPushButton *button = (QPushButton*)sender();
+        operatorAllowed = true;
+        openParenthAllowed = false;
+        closingParenthAllowed = true;
 
-    if(input->text().length() == 1 && input->text()[0] == '0')
-    {
-        input->setText(input->text().replace(0, 1, button->text()));
+        if(input->text().length() == 1 && input->text()[0] == '0')
+        {
+            input->setText(input->text().replace(0, 1, button->text()));
+        }
+        else
+        {
+            input->setText(input->text().append(button->text()));
+        }
     }
-    else
-    {
-        input->setText(input->text().append(button->text()));
-    }
-    //input->setText(QString::number(
-    //                                input->text().append(
-    //                                button->text()
-    //                                ).toDouble(), 'g', 15)
-    //                         );
 }
 
 /* When the decimal point button is released, add a decimal point to
@@ -150,9 +198,13 @@ void MainWindow::on_binary_button_released()
 {
     QPushButton *button = (QPushButton*)sender();
 
-    if(!operatorUsedDirectlyBefore())
+    if(operatorAllowed)
     {
         input->setText(input->text().append(" " + button->text() + " "));
+        digitAllowed = true;
+        operatorAllowed = false;
+        openParenthAllowed = true;
+        closingParenthAllowed = false;
     }
 }
 
@@ -163,7 +215,8 @@ void MainWindow::on_binary_button_released()
  */
 void MainWindow::on_buttonEquals_released()
 {
-    if(!operatorUsedDirectlyBefore())
+    if(!operatorUsedDirectlyBefore() &&
+            numOpenParenths == numClosingParenths)
     {
         emit input_is_ready(input->text());
     }
@@ -180,4 +233,53 @@ void MainWindow::on_buttonClear_released()
 
 void MainWindow::on_buttonRoot_released()
 {
+    // TODO nth root
+}
+
+void MainWindow::on_buttonOpenParenth_released()
+{
+    if(openParenthAllowed)
+    {
+        input->setText(input->text().append("("));
+        numOpenParenths++;
+        digitAllowed = true;
+        operatorAllowed = false;
+        closingParenthAllowed = true;
+    }
+}
+
+void MainWindow::on_buttonCloseParenth_released()
+{
+    if(closingParenthAllowed &&
+            (numClosingParenths < numOpenParenths))
+    {
+        input->setText(input->text().append(")"));
+        numClosingParenths++;
+        digitAllowed = false;
+        operatorAllowed = true;
+        openParenthAllowed = false;
+    }
+}
+
+void MainWindow::on_buttonXSquared_released()
+{
+    // TODO x squared
+}
+
+void MainWindow::on_buttonSqrt_released()
+{
+    // TODO square root
+}
+
+void MainWindow::on_buttonBack_released()
+{
+    if(input->text().length() == 1)
+    {
+        input->setText("0");
+    }
+    else
+    {
+        QString text = input->text();
+        input->setText(text.remove(text.length()-1, 1));
+    }
 }
