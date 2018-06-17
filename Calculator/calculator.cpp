@@ -60,13 +60,12 @@ QStringList Calculator::scanInputAndGrabTokens()
  */
 void Calculator::run()
 {
-    QStringList tokens = scanInputAndGrabTokens();
-    QStringList postfix = postfixConverter.convertToPostfix(tokens);
+    QStringList tokens = postfixConverter.convertToPostfix(scanInputAndGrabTokens());
 
-    /* // Uncomment for debugging
-    for(QStringList::Iterator it = postfix.begin(); it != postfix.end(); ++it)
+    // Uncomment for debugging
+    for(QStringList::Iterator it = tokens.begin(); it != tokens.end(); ++it)
     {
         qDebug() << (*it);
     }
-    */
+
 }

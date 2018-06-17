@@ -1,10 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "operator.h"
-#include <QDebug>
+#include <QDebug>               // debug output
 #include <QChar>
-#include <QShortcut>
-#include <QKeySequence>
+#include <QShortcut>            // keyboard input
+#include <QKeySequence>         // keyboard input
+#include <QFont>                // Qt fonts
 
 // TODO add parentheses operations to calculator
 
@@ -231,6 +232,33 @@ void MainWindow::on_buttonEquals_released()
 void MainWindow::on_buttonClear_released()
 {
     input->setText("0");
+    digitAllowed = true;
+    operatorAllowed = true;
+    openParenthAllowed = false;
+    closingParenthAllowed = false;
+    numOpenParenths = 0;
+    numClosingParenths = 0;
+}
+
+// TODO IMPORTANT! Does not undo any flags that were set!!!
+// maybe create two status objects that encapsulate the flags and have pointers to them
+// that destructor cleans up; one is for previous state and one is for current state
+// and when backspace released, we should update current state to previous state
+
+// TODO backspace for an operator should remove space before and after the operator
+void MainWindow::on_buttonBack_released()
+{
+    if(input->text().length() == 1)
+    {
+        input->setText("0");
+    }
+    else
+    {
+        QString text = input->text();
+        if(text.at(text.length()-1) == '('){ numOpenParenths--; }
+        else if(text.at(text.length()-1) == ')'){ numClosingParenths--; }
+        else{ input->setText(text.remove(text.length()-1, 1)); }
+    }
 }
 
 void MainWindow::on_buttonRoot_released()
@@ -271,17 +299,4 @@ void MainWindow::on_buttonXSquared_released()
 void MainWindow::on_buttonSqrt_released()
 {
     // TODO square root
-}
-
-void MainWindow::on_buttonBack_released()
-{
-    if(input->text().length() == 1)
-    {
-        input->setText("0");
-    }
-    else
-    {
-        QString text = input->text();
-        input->setText(text.remove(text.length()-1, 1));
-    }
 }
