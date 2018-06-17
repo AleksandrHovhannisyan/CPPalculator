@@ -147,7 +147,7 @@ void MainWindow::on_buttonDecimalPoint_released()
  * Negating a negative number will remove the negative sign. Negating the
  * right operand of addition will change the '+' operator to subtraction.
  * Similarly, negating the right operand of subtraction will change the
- * '–' operator to addition.
+ * '-' operator to addition.
  */
 void MainWindow::on_buttonNegate_released()
 {
@@ -185,10 +185,10 @@ void MainWindow::on_buttonNegate_released()
             // If it was a plus, change that to a minus
             if(lastOperator == '+')
             {
-                input->setText(input->text().replace(indexOfLastOperator, 1, "–"));
+                input->setText(input->text().replace(indexOfLastOperator, 1, "-"));
             }
             // If it was a minus, change that to a plus
-            else if(lastOperator == '–')
+            else if(lastOperator == '-')
             {
                 input->setText(input->text().replace(indexOfLastOperator, 1, "+"));
             }
@@ -200,7 +200,6 @@ void MainWindow::on_buttonNegate_released()
         }
     }
 
-    // TODO or parenthetical expression?
     // Case 2: No operators and already negative number
     else if(input->text().at(0) == '-')
     {
@@ -215,7 +214,7 @@ void MainWindow::on_buttonNegate_released()
 }
 
 /* Called when a user clicks any binary operation's button
- * (+, -, *, /). Inserts the appropriate operation into input.
+ * (+, -, *, /). Appends the corresponding operator to input.
  */
 void MainWindow::on_binary_button_released()
 {

@@ -320,7 +320,7 @@
      </font>
     </property>
     <property name="text">
-     <string>–</string>
+     <string>-</string>
     </property>
     <attribute name="buttonGroup">
      <string notr="true">buttonGroup</string>

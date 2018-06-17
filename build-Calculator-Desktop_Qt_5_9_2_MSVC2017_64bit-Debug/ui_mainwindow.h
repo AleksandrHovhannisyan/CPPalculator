@@ -231,7 +231,7 @@ public:
         button9->setText(QApplication::translate("MainWindow", "9", Q_NULLPTR));
         buttonEquals->setText(QApplication::translate("MainWindow", "=", Q_NULLPTR));
         buttonPlus->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
-        buttonMinus->setText(QApplication::translate("MainWindow", "\342\200\223", Q_NULLPTR));
+        buttonMinus->setText(QApplication::translate("MainWindow", "-", Q_NULLPTR));
         buttonTimes->setText(QApplication::translate("MainWindow", "\303\227", Q_NULLPTR));
         buttonDivide->setText(QApplication::translate("MainWindow", "\303\267", Q_NULLPTR));
         buttonRoot->setText(QApplication::translate("MainWindow", "rt", Q_NULLPTR));
