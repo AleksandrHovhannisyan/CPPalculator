@@ -2,10 +2,6 @@
 #include <QStack>
 #include <QChar>
 
-PostfixConverter::PostfixConverter()
-{
-    failedToConvert = false;
-}
 
 /* Private helper. Checks if a token represents an integer.*/
 bool PostfixConverter::isNumber(QString token)
@@ -24,13 +20,12 @@ bool PostfixConverter::isNumber(QString token)
 }
 
 /* Parses an infix mathematical expression to postfix notation
- * using the Shunting-yard algorithm.
+ * using the Shunting-yard algorithm. Returns the list of tokens.
  */
-void PostfixConverter::convertToPostfix(const QStringList& input)
+QStringList PostfixConverter::convertToPostfix(const QStringList& input)
 {
-    // Allows for reusability of the converter
+    // Allows for reuse of converter
     output.clear();
-    failedToConvert = false;
 
     // Note: operatorStack may contain parentheses, which are NOT operators
     QStack<QString> operatorStack;
@@ -78,19 +73,15 @@ void PostfixConverter::convertToPostfix(const QStringList& input)
 
             operatorStack.pop();
         }
-        // Token is invalid if none of the above were true
-        else
-        {
-            failedToConvert = true;
-            return;
-        }
     }
 
     // Final emptying
-    while( !operatorStack.empty() && isOperator(operatorStack.top()) )
+    while(!operatorStack.empty() && isOperator(operatorStack.top()))
     {
         popOperator(operatorStack);
     }
+
+    return output;
 }
 
 /* A fairly common operation. See @convertToPostfix. */

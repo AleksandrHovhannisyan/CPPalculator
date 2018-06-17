@@ -26,6 +26,7 @@ private:
     QString input;
     QString output;
     PostfixConverter postfixConverter;
+    QStringList scanInputAndGrabTokens();
 };
 
 

@@ -14,14 +14,10 @@
 class PostfixConverter
 {
 public:
-    PostfixConverter();
-    void convertToPostfix(const QStringList& input);
-    QStringList getOutput() const { return output; }
-    bool conversionFailed() { return failedToConvert; }
+    QStringList convertToPostfix(const QStringList& input);
 
 private:
     QStringList output;
-    bool failedToConvert;
 
     bool isNumber(QString token);
     bool isOperator(QString token){ return operators.count(token) == 1; }
