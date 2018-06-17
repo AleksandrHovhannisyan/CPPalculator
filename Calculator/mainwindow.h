@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QKeyEvent>
+#include <QStack>
 
 namespace Ui {
 class MainWindow;
@@ -14,6 +15,26 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    /* Used to keep track of the history of operations that the user
+     * performed when entering input. Primarily used by backspace and
+     * clear to undo previous user input and restore the calculator's
+     * state to its previous input restrictions.
+     */
+    struct State
+    {
+        bool digitAllowed;
+        bool operatorAllowed;
+        bool openParenthAllowed;
+        bool closingParenthAllowed;
+        int numOpenParenths;
+        int numClosingParenths;
+        State(bool dig, bool op, bool oP, bool cP, int nO=0, int nC=0) :
+            digitAllowed(dig), operatorAllowed(op),
+            openParenthAllowed(oP), closingParenthAllowed(cP),
+            numOpenParenths(nO), numClosingParenths(nC) {}
+        State() {}
+    };
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     Ui::MainWindow* getUI() const { return ui; }
@@ -22,13 +43,9 @@ public:
 private:
     Ui::MainWindow *ui;
     QLabel *input;
-    bool operatorAllowed;
-    bool digitAllowed;
-    bool openParenthAllowed;
-    bool closingParenthAllowed;
-    int numOpenParenths;
-    int numClosingParenths;
+    QStack<State> history;
     bool operatorUsedDirectlyBefore() const;
+    void reset();
 
 signals:
     void input_is_ready(QString input);

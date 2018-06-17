@@ -20,7 +20,7 @@ void Calculator::on_input_given(QString input)
  */
 QStringList Calculator::scanInputAndGrabTokens()
 {
-    qDebug() << "Input accepted.";
+    qDebug() << "Input accepted and parsed to postfix.";
     QStringList tokens;
     QString runningToken = "";
 
@@ -28,23 +28,19 @@ QStringList Calculator::scanInputAndGrabTokens()
     {
         QChar c = input[i];
 
-        // Add digits to running token
+        // Digits
         if(c.isDigit() || c == '.' || c == '-')
         {
             runningToken.append(c);
         }
-        // Ignore whitespace
-        else if(c == ' ')
-        {
-            if(runningToken != ""){ tokens.push_back(runningToken); }
-            runningToken = "";
-        }
-        // An operator
+        // Operators
         else if(operators.count(QString::QString(c)))
         {
+            tokens.push_back(runningToken);
             runningToken = "";
             tokens.push_back(QString::QString(c));
         }
+        // Parentheses
         else if(c == '(' || c == ')')
         {
             if(runningToken != ""){ tokens.push_back(runningToken); runningToken = ""; }

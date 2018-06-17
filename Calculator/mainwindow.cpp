@@ -7,8 +7,11 @@
 #include <QKeySequence>         // keyboard input
 #include <QFont>                // Qt fonts
 
-// TODO add parentheses operations to calculator
 
+/* Constructor for MainWindow objects. Connects all button signals
+ * to their appropriate private slots to handle user input and sets
+ * up some basic member variables.
+ */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -16,12 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Basic variable setups
     ui->setupUi(this);
     input = ui->labelInput;
-    digitAllowed = true;
-    operatorAllowed = true;
-    openParenthAllowed = false;
-    closingParenthAllowed = false;
-    numOpenParenths = 0;
-    numClosingParenths = 0;
+    reset();
 
     // Connect digits' released() signals to on_digit_released
     connect(ui->button0, SIGNAL(released()), this, SLOT(on_digit_released()));
@@ -89,39 +87,41 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete input;
     delete ui;
 }
 
-/* Used by other functions when checking if an operator was
- * already applied directly before the current attempt at
- * either evaluating the expression or adding a new operator.
+/* Used by other functions to check if an operator was
+ * applied directly before the current user's input token.
  */
 bool MainWindow::operatorUsedDirectlyBefore() const
 {
-    if(input->text().length() >= 2)
-    {
-        // Operators have a space after (e.g., " + "). Hence length()-2.
-        // If input is like "1 + 2", return false b/c " " is not operator.
-        return ((bool)operators.count(input->text().at(input->text().length()-2)));
-    }
-    return false;
+    return ((bool)operators.count(input->text().at(input->text().length()-1)));
 }
 
 
-/* When a digit button is pressed, its text gets relayed to input label */
+/* Called when a user clicks any of the digit buttons (0-9) or
+ * enters a digit from their keyboard (0-9). Appends the corresponding
+ * digit to the input.
+ */
 void MainWindow::on_digit_released()
 {
-    if(digitAllowed)
+    State currentState = history.top();
+
+    if(currentState.digitAllowed)
     {
         QPushButton *button = (QPushButton*)sender();
-        operatorAllowed = true;
-        openParenthAllowed = false;
-        closingParenthAllowed = true;
 
+        history.push(State(true, true, false, true,
+                                history.top().numOpenParenths,
+                                history.top().numClosingParenths));
+
+        // Initial input is just a 0
         if(input->text().length() == 1 && input->text()[0] == '0')
         {
             input->setText(input->text().replace(0, 1, button->text()));
         }
+        // Otherwise, append the digit
         else
         {
             input->setText(input->text().append(button->text()));
@@ -129,9 +129,10 @@ void MainWindow::on_digit_released()
     }
 }
 
-/* When the decimal point button is released, add a decimal point to
- * input label if we haven't done so already (see decimalHasBeenAdded).
-*/
+/* Called when a user clicks the '.' button or uses the keyboard
+ * shortcut '.' Appends a decimal point to the last digit that was
+ * entered.
+ */
 void MainWindow::on_buttonDecimalPoint_released()
 {
     // TODO prevent entry of multiple decimal points
@@ -141,124 +142,149 @@ void MainWindow::on_buttonDecimalPoint_released()
     }
 }
 
-/* Handles functionality of negating an input expression.
- * Negating an expression applies the negative sign to the
- * last number entered (if one exists). Negating a
- * negative number will remove the negative sign.
+/* Called when a user clicks the '±' button. Negates an input expression.
+ * Applies the negative sign to the last number entered (if one exists).
+ * Negating a negative number will remove the negative sign. Negating the
+ * right operand of addition will change the '+' operator to subtraction.
+ * Similarly, negating the right operand of subtraction will change the
+ * '–' operator to addition.
  */
 void MainWindow::on_buttonNegate_released()
 {
-    if(operatorUsedDirectlyBefore()){ return; }
-
     // Check if there are currently any operators in input
     bool inputHasOperators = false;
-    for(int i = 0; i < input->text().length(); i++)
+    // If so, get the index of the last one (hence reverse traversal)
+    int indexOfLastOperator = -1;
+    for(int i = input->text().length() - 1; i >= 0; i--)
     {
         if(operators.count(input->text().at(i)) == 1)
         {
             inputHasOperators = true;
+            indexOfLastOperator = i;
             break;
         }
     }
 
-    // Input expression contains operators
+    // If we entered an operator and then tried to negate something
+    if(indexOfLastOperator == input->text().length()-1){ return; }
+
+    // Case 1: Input contains operators
     if(inputHasOperators)
     {
-        int indexOfLastWhitespace = input->text().lastIndexOf(' ');
+        QChar lastOperator = input->text().at(indexOfLastOperator);
 
-        // If the number is negative and part of an expression w/ ops
-        if(input->text().at(indexOfLastWhitespace+1) == '-')
+        // If the number in question is already negative, undo it
+        if(input->text().at(indexOfLastOperator+1) == '-')
         {
-            input->setText(input->text().replace(indexOfLastWhitespace+1, 1, ""));
+            input->setText(input->text().replace(indexOfLastOperator+1, 1, ""));
         }
 
-        // Otherwise, just a positive number part of an expression w/ ops
+        // If not, let's check what kind of operator came before it
         else
         {
-            input->setText(input->text().insert(indexOfLastWhitespace+1, '-'));
+            // If it was a plus, change that to a minus
+            if(lastOperator == '+')
+            {
+                input->setText(input->text().replace(indexOfLastOperator, 1, "–"));
+            }
+            // If it was a minus, change that to a plus
+            else if(lastOperator == '–')
+            {
+                input->setText(input->text().replace(indexOfLastOperator, 1, "+"));
+            }
+            // Otherwise, just negate the last number
+            else
+            {
+                input->setText(input->text().insert(indexOfLastOperator+1, '-'));
+            }
         }
     }
 
     // TODO or parenthetical expression?
-    // No operators and already negative number
+    // Case 2: No operators and already negative number
     else if(input->text().at(0) == '-')
     {
         input->setText(input->text().replace(0, 1, ""));
     }
 
-    // No operators and positive number
+    // Case 3: No operators and positive number
     else
     {
         input->setText(input->text().prepend("-"));
     }
 }
 
-/* If the user presses any binary operation's button, like
- * plus, minus, multiply, or divide, this slot will be called
- * to insert the appropriate operation into the current input.
+/* Called when a user clicks any binary operation's button
+ * (+, -, *, /). Inserts the appropriate operation into input.
  */
 void MainWindow::on_binary_button_released()
 {
     QPushButton *button = (QPushButton*)sender();
+    State currentState = history.top();
 
-    if(operatorAllowed)
+    if(currentState.operatorAllowed)
     {
-        input->setText(input->text().append(" " + button->text() + " "));
-        digitAllowed = true;
-        operatorAllowed = false;
-        openParenthAllowed = true;
-        closingParenthAllowed = false;
+        input->setText(input->text().append(button->text()));
+        history.push(State(true, false, true, false,
+                           currentState.numOpenParenths,
+                           currentState.numClosingParenths));
     }
 }
 
-/* If the user releases the = button, then they want
- * the answer to their input to be calculated.
- * Emits input_is_ready signal to give Calculator
- * the input it needs to do its job.
+/* Called when a user clicks the '=' button or uses the keyboard
+ * shortcut 'Enter'. Checks if the input is ready for evaluation.
+ * If so, emits input_is_ready signal, effectively handing its
+ * input string to the Calculator for processing.
  */
 void MainWindow::on_buttonEquals_released()
 {
+    State currentState = history.top();
     if(!operatorUsedDirectlyBefore() &&
-            numOpenParenths == numClosingParenths)
+            currentState.numOpenParenths == currentState.numClosingParenths)
     {
         emit input_is_ready(input->text());
     }
 }
 
-/* Pretty straightforward. Basically, if the user
- * presses and releases the clear button, then
- * set the input string to just 0.
+/* Used to reset user input. Sets the input string to "0", clears its
+ * history, and applies all initial input restrictions.
+ */
+void MainWindow::reset()
+{
+    input->setText("0");
+    history.clear();
+    history.push(State(true, true, false, false));
+}
+
+/* Called when a user clicks the 'Clear' button or uses the keyboard
+ * shortcut 'Delete'. Resets the input. See MainWindow::reset().
  */
 void MainWindow::on_buttonClear_released()
 {
-    input->setText("0");
-    digitAllowed = true;
-    operatorAllowed = true;
-    openParenthAllowed = false;
-    closingParenthAllowed = false;
-    numOpenParenths = 0;
-    numClosingParenths = 0;
+    reset();
 }
 
-// TODO IMPORTANT! Does not undo any flags that were set!!!
-// maybe create two status objects that encapsulate the flags and have pointers to them
-// that destructor cleans up; one is for previous state and one is for current state
-// and when backspace released, we should update current state to previous state
-
-// TODO backspace for an operator should remove space before and after the operator
+/* Called when a user clicks the 'Back' button or uses the
+ * keyboard shortcut 'Backspace'. Reverts the calculator to
+ * its previous state of input. Reapplies all appropriate input
+ * restrictions that existed prior to deletion of the last token.
+ */
 void MainWindow::on_buttonBack_released()
 {
+    // If the input is just a single digit, set it to 0
     if(input->text().length() == 1)
     {
         input->setText("0");
     }
+
+    // Otherwise, if we have 2 or more entries, remove last char
     else
     {
         QString text = input->text();
-        if(text.at(text.length()-1) == '('){ numOpenParenths--; }
-        else if(text.at(text.length()-1) == ')'){ numClosingParenths--; }
-        else{ input->setText(text.remove(text.length()-1, 1)); }
+        input->setText(text.remove(text.length()-1, 1));
     }
+
+    if(history.size() >= 2){ history.pop();}
 }
 
 void MainWindow::on_buttonRoot_released()
@@ -266,28 +292,37 @@ void MainWindow::on_buttonRoot_released()
     // TODO nth root
 }
 
+/* Called when a user pushes the '(' button or uses the
+ * keyboard shortcut SHIFT+9. Appends an opening parenthesis
+ * to the input. Disables entry of closing parentheses
+ * and operators directly afterwards.
+ */
 void MainWindow::on_buttonOpenParenth_released()
 {
-    if(openParenthAllowed)
+    if(history.top().openParenthAllowed)
     {
         input->setText(input->text().append("("));
-        numOpenParenths++;
-        digitAllowed = true;
-        operatorAllowed = false;
-        closingParenthAllowed = true;
+        history.push(State(true, false, true, false,
+                           history.top().numOpenParenths+1,
+                           history.top().numClosingParenths));
     }
 }
 
+/* Called when a user pushes the ')' button or uses the
+ * keyboard shortcut SHIFT+0. Appends a closing parenthesis
+ * to the input. Disables entry of opening parentheses and
+ * digits directly afterwards.
+ */
 void MainWindow::on_buttonCloseParenth_released()
 {
-    if(closingParenthAllowed &&
-            (numClosingParenths < numOpenParenths))
+    State currentState = history.top();
+    if(currentState.closingParenthAllowed &&
+            (currentState.numClosingParenths < currentState.numOpenParenths))
     {
         input->setText(input->text().append(")"));
-        numClosingParenths++;
-        digitAllowed = false;
-        operatorAllowed = true;
-        openParenthAllowed = false;
+        history.push(State(false, true, false, true,
+                           history.top().numOpenParenths,
+                           history.top().numClosingParenths+1));
     }
 }
 
