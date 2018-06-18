@@ -3,6 +3,10 @@
 #include "calculator.h"
 #include "operator.h"   // for global "operators" map (see below for def)
 
+
+// TODO let user copy  with ctrl+c
+// TODO resizing screen? oof
+
 QMap<QString, Operator> operators;
 
 /* Adds all valid operators for this calculator program to the global
