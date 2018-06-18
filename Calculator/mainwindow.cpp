@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "operator.h"
+#include "utilityFunctions.h"            // custom commonly used functions
 #include <QDebug>                        // debug output
 #include <QChar>
 #include <QShortcut>                     // keyboard input
 #include <QKeySequence>                  // keyboard input
-#include "utilityFunctions.h"            // custom commonly used functions
 #include <QThread>                       // for sleep delay when dividing by zero
 #include <QApplication>
 
@@ -117,7 +117,7 @@ void MainWindow::on_digit_released()
     {
         QPushButton *button = (QPushButton*)sender();
 
-        history.push(State(true, true, false, true,
+        history.push(State(true, true, true, false, true,
                                 history.top().numOpenParenths,
                                 history.top().numClosingParenths));
 
@@ -141,9 +141,12 @@ void MainWindow::on_digit_released()
 void MainWindow::on_buttonDecimalPoint_released()
 {
     // TODO prevent entry of multiple decimal points
-    if(!operatorUsedDirectlyBefore())
+    if(history.top().decimalAllowed)
     {
         input->setText(input->text() + ".");
+        history.push(State(true, true, false, false, true,
+                                history.top().numOpenParenths,
+                                history.top().numClosingParenths));
     }
 }
 
@@ -233,7 +236,7 @@ void MainWindow::on_binary_button_released()
     if(tokenIsNegation(button->text().at(0), input->text(), input->text().length()))
     {
         input->setText(input->text().append(button->text()));
-        history.push(State(true, false, true, false,
+        history.push(State(true, false, true, true, false,
                     currentState.numOpenParenths,
                     currentState.numClosingParenths));
     }
@@ -241,7 +244,7 @@ void MainWindow::on_binary_button_released()
     else if(currentState.operatorAllowed)
     {
         input->setText(input->text().append(button->text()));
-        history.push(State(true, false, true, false,
+        history.push(State(true, false, true, true, false,
                            currentState.numOpenParenths,
                            currentState.numClosingParenths));
     }
@@ -269,7 +272,7 @@ void MainWindow::reset()
 {
     input->setText("0");
     history.clear();
-    history.push(State(true, true, false, false));
+    history.push(State(true, true, true, false, false));
 }
 
 /* Called when a user clicks the 'Clear' button or uses the keyboard
@@ -318,7 +321,7 @@ void MainWindow::on_buttonOpenParenth_released()
     if(history.top().openParenthAllowed)
     {
         input->setText(input->text().append("("));
-        history.push(State(true, false, true, false,
+        history.push(State(true, false, true, true, false,
                            history.top().numOpenParenths+1,
                            history.top().numClosingParenths));
     }
@@ -336,7 +339,7 @@ void MainWindow::on_buttonCloseParenth_released()
             (currentState.numClosingParenths < currentState.numOpenParenths))
     {
         input->setText(input->text().append(")"));
-        history.push(State(false, true, false, true,
+        history.push(State(false, true, false, false, true,
                            history.top().numOpenParenths,
                            history.top().numClosingParenths+1));
     }
@@ -355,14 +358,16 @@ void MainWindow::on_buttonSqrt_released()
 /* Receives signal from Calculator that output of calculation is ready */
 void MainWindow::on_output_is_ready(QString output)
 {
+    reset();
     input->setText(output);
 
-    // If division by zero, temporarily disable inputs
+    // If user divided by zero, temporarily disable input after message
     if(output == "No division by zero")
     {
         QApplication::processEvents();
         QThread::sleep(1);
-    }
 
-    reset();
+        // And then reset again
+        reset();
+    }
 }

@@ -26,12 +26,18 @@ class MainWindow : public QMainWindow
         bool operatorAllowed;
         bool openParenthAllowed;
         bool closingParenthAllowed;
+        bool decimalAllowed;
         int numOpenParenths;
         int numClosingParenths;
-        State(bool dig, bool op, bool oP, bool cP, int nO=0, int nC=0) :
+
+        State(bool dig, bool op, bool dec,
+              bool openP, bool closeP,
+              int numOpenP=0, int numCloseP=0, int nDec=0) :
             digitAllowed(dig), operatorAllowed(op),
-            openParenthAllowed(oP), closingParenthAllowed(cP),
-            numOpenParenths(nO), numClosingParenths(nC) {}
+            openParenthAllowed(openP), closingParenthAllowed(closeP),
+            decimalAllowed(dec), numOpenParenths(numOpenP),
+            numClosingParenths(numCloseP) {}
+
         State() {}
     };
 

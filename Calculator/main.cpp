@@ -14,10 +14,12 @@ void setUpOperators()
     Operator minus(Left, 1);
     Operator times(Left, 2);
     Operator divide(Left, 2);
+    Operator root(Right, 3);
     operators["+"] = plus;
     operators["-"] = minus;
     operators["×"] = times;
     operators["÷"] = divide;
+    operators["rt"] = root;
 }
 
 int main(int argc, char *argv[])
