@@ -62,8 +62,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QShortcut *shortcutDivide = new QShortcut(QKeySequence("/"), this);
     QShortcut *shortcutOpenParenth = new QShortcut(QKeySequence("SHIFT+9"), this);
     QShortcut *shortcutCloseParenth = new QShortcut(QKeySequence("SHIFT+0"), this);
-    QShortcut *shortcutEnter = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    QShortcut *shortcutEnter1 = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    QShortcut *shortcutEnter2 = new QShortcut(QKeySequence("Enter"), this);
     QShortcut *shortcutBackspace = new QShortcut(QKeySequence("Backspace"), this);
+    QShortcut *shortcutClear = new QShortcut(QKeySequence("Delete"), this);
     connect(shortcut0, SIGNAL(activated()), ui->button0, SLOT(click()));
     connect(shortcut1, SIGNAL(activated()), ui->button1, SLOT(click()));
     connect(shortcut2, SIGNAL(activated()), ui->button2, SLOT(click()));
@@ -81,8 +83,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(shortcutDivide, SIGNAL(activated()), ui->buttonDivide, SLOT(click()));
     connect(shortcutOpenParenth, SIGNAL(activated()), ui->buttonOpenParenth, SLOT(click()));
     connect(shortcutCloseParenth, SIGNAL(activated()), ui->buttonCloseParenth, SLOT(click()));
-    connect(shortcutEnter, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
+    connect(shortcutEnter1, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
+    connect(shortcutEnter2, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
     connect(shortcutBackspace, SIGNAL(activated()), ui->buttonBack, SLOT(click()));
+    connect(shortcutClear, SIGNAL(activated()), ui->buttonClear, SLOT(click()));
 }
 
 MainWindow::~MainWindow()
@@ -212,6 +216,8 @@ void MainWindow::on_buttonNegate_released()
         input->setText(input->text().prepend("-"));
     }
 }
+
+// TODO if we negate for example "1*-2", then it doesn't work because - is treated as an operator :(
 
 /* Called when a user clicks any binary operation's button
  * (+, -, *, /). Appends the corresponding operator to input.

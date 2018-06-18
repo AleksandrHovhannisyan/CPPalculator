@@ -30,7 +30,7 @@ QStringList Calculator::scanInputAndGrabTokens()
         QChar c = input[i];
 
         // Digits
-        if(c.isDigit() || c == '.')
+        if(c.isDigit() || c == '.' || (c == '-' && i == 0))
         {
             runningToken.append(c);
             // If the digit is at the end of the input, push it
@@ -49,8 +49,12 @@ QStringList Calculator::scanInputAndGrabTokens()
             if(runningToken != ""){ tokens.push_back(runningToken); runningToken = ""; }
             tokens.push_back(QString::QString(c));
         }
+    }
 
-        qDebug() << "Running token: " << runningToken;
+    qDebug() << "----------------INPUT TOKENS-------------------";
+    for(int i = 0; i < tokens.size(); i++)
+    {
+        qDebug() << tokens[i];
     }
 
     return tokens;
