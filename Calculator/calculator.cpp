@@ -62,9 +62,10 @@ QStringList Calculator::scanInputAndGrabTokens()
 }
 
 /* Calculates the floating-point value of the input. */
-double Calculator::evaluateInput(const QStringList &tokens)
+QString Calculator::evaluateInput(const QStringList &tokens)
 {
     QStack<double> operands;
+    bool divByZero = false;
 
     for(QStringList::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
     {
@@ -81,20 +82,22 @@ double Calculator::evaluateInput(const QStringList &tokens)
             else if(token == "×"){ operands.push(leftOperand*rightOperand); }
             else if(token == "÷")
             {
+                divByZero = (rightOperand == 0);
+                if(divByZero){ return "No division by zero"; }
                 operands.push(leftOperand/rightOperand);
-            }       // TODO div by zero
+            }
         }
         // Number
         else { operands.push(token.toDouble()); }
     }
 
-    return operands.pop();
+    return QString::number(operands.pop());
 }
 
 /* Called as soon as input is ready for processing. */
 void Calculator::run()
 {
     QStringList tokens = postfixConverter.convertToPostfix(scanInputAndGrabTokens());
-    QString answer = QString::number(evaluateInput(tokens));
+    QString answer = evaluateInput(tokens);
     emit output_is_ready(answer);
 }

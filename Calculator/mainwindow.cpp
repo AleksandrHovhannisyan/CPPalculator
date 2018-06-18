@@ -6,6 +6,8 @@
 #include <QShortcut>                     // keyboard input
 #include <QKeySequence>                  // keyboard input
 #include "utilityFunctions.h"            // custom commonly used functions
+#include <QThread>                       // for sleep delay when dividing by zero
+#include <QApplication>
 
 /* Constructor for MainWindow objects. Connects all button signals
  * to their appropriate private slots to handle user input and sets
@@ -231,7 +233,7 @@ void MainWindow::on_binary_button_released()
     if(tokenIsNegation(button->text().at(0), input->text(), input->text().length()))
     {
         input->setText(input->text().append(button->text()));
-        history.push(State(true, true, true, false,
+        history.push(State(true, false, true, false,
                     currentState.numOpenParenths,
                     currentState.numClosingParenths));
     }
@@ -353,6 +355,14 @@ void MainWindow::on_buttonSqrt_released()
 /* Receives signal from Calculator that output of calculation is ready */
 void MainWindow::on_output_is_ready(QString output)
 {
-    reset();
     input->setText(output);
+
+    // If division by zero, temporarily disable inputs
+    if(output == "No division by zero")
+    {
+        QApplication::processEvents();
+        QThread::sleep(1);
+    }
+
+    reset();
 }

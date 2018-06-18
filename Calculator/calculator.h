@@ -21,7 +21,7 @@ public slots:
 
 public:
     void run();
-    double evaluateInput(const QStringList &tokens);
+    QString evaluateInput(const QStringList &tokens);
 
 private:
     QString input;
