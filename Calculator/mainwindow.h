@@ -32,7 +32,7 @@ class MainWindow : public QMainWindow
 
         State(bool dig, bool op, bool dec,
               bool openP, bool closeP,
-              int numOpenP=0, int numCloseP=0, int nDec=0) :
+              int numOpenP=0, int numCloseP=0) :
             digitAllowed(dig), operatorAllowed(op),
             openParenthAllowed(openP), closingParenthAllowed(closeP),
             decimalAllowed(dec), numOpenParenths(numOpenP),
@@ -66,11 +66,8 @@ private slots:
     void on_binary_button_released();
     void on_buttonEquals_released();
     void on_buttonClear_released();
-    void on_buttonRoot_released();
     void on_buttonOpenParenth_released();
     void on_buttonCloseParenth_released();
-    void on_buttonXSquared_released();
-    void on_buttonSqrt_released();
     void on_buttonBack_released();
 };
 

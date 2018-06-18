@@ -1,13 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "operator.h"
-#include "utilityFunctions.h"            // custom commonly used functions
-#include <QDebug>                        // debug output
+#include "utilityFunctions.h"           // custom commonly used functions
+#include <QDebug>                       // debug output
 #include <QChar>
-#include <QShortcut>                     // keyboard input
-#include <QKeySequence>                  // keyboard input
-#include <QThread>                       // for sleep delay when dividing by zero
-#include <QApplication>
+#include <QShortcut>                    // keyboard input
+#include <QKeySequence>                 // keyboard input
+#include <QThread>                      // for sleep delay when dividing by zero
+#include <QApplication>                 // same as QThread
+
 
 /* Constructor for MainWindow objects. Connects all button signals
  * to their appropriate private slots to handle user input and sets
@@ -43,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_binary_button_released()));
     connect(ui->buttonDivide, SIGNAL(released()),
             this, SLOT(on_binary_button_released()));
+    connect(ui->buttonRoot, SIGNAL(released()),
+            this, SLOT(on_binary_button_released()));
 
     // Shortcuts for math input via keyboard
     // TODO potential memory leaks
@@ -67,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QShortcut *shortcutEnter2 = new QShortcut(QKeySequence("Enter"), this);
     QShortcut *shortcutBackspace = new QShortcut(QKeySequence("Backspace"), this);
     QShortcut *shortcutClear = new QShortcut(QKeySequence("Delete"), this);
+    QShortcut *shortcutRoot = new QShortcut(QKeySequence(Qt::Key_R), this);
     connect(shortcut0, SIGNAL(activated()), ui->button0, SLOT(click()));
     connect(shortcut1, SIGNAL(activated()), ui->button1, SLOT(click()));
     connect(shortcut2, SIGNAL(activated()), ui->button2, SLOT(click()));
@@ -84,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(shortcutDivide, SIGNAL(activated()), ui->buttonDivide, SLOT(click()));
     connect(shortcutOpenParenth, SIGNAL(activated()), ui->buttonOpenParenth, SLOT(click()));
     connect(shortcutCloseParenth, SIGNAL(activated()), ui->buttonCloseParenth, SLOT(click()));
+    connect(shortcutRoot, SIGNAL(activated()), ui->buttonRoot, SLOT(click()));
     connect(shortcutEnter1, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
     connect(shortcutEnter2, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
     connect(shortcutBackspace, SIGNAL(activated()), ui->buttonBack, SLOT(click()));
@@ -121,12 +126,12 @@ void MainWindow::on_digit_released()
                                 history.top().numOpenParenths,
                                 history.top().numClosingParenths));
 
-        // Initial input is just a 0
+        // Initial input is just a 0, so check for that case
         if(input->text().length() == 1 && input->text()[0] == '0')
         {
             input->setText(input->text().replace(0, 1, button->text()));
         }
-        // Otherwise, append the digit
+        // Otherwise, just append the digit
         else
         {
             input->setText(input->text().append(button->text()));
@@ -140,7 +145,6 @@ void MainWindow::on_digit_released()
  */
 void MainWindow::on_buttonDecimalPoint_released()
 {
-    // TODO prevent entry of multiple decimal points
     if(history.top().decimalAllowed)
     {
         input->setText(input->text() + ".");
@@ -168,7 +172,7 @@ void MainWindow::on_buttonNegate_released()
         // Check that what we found is in fact an operator and not a negation
         // (That's only ambiguous for subtraction)
         QChar c = input->text().at(i);
-        if(operators.count(c) == 1 && !(tokenIsNegation(c, input->text(), i)))
+        if((operators.count(c) == 1 || c == 'r' || c == 't') && !(tokenIsNegation(c, input->text(), i)))
         {
             inputHasOperators = true;
             indexOfLastOperator = i;
@@ -306,11 +310,6 @@ void MainWindow::on_buttonBack_released()
     if(history.size() >= 2){ history.pop();}
 }
 
-void MainWindow::on_buttonRoot_released()
-{
-    // TODO nth root
-}
-
 /* Called when a user pushes the '(' button or uses the
  * keyboard shortcut SHIFT+9. Appends an opening parenthesis
  * to the input. Disables entry of closing parentheses
@@ -345,24 +344,18 @@ void MainWindow::on_buttonCloseParenth_released()
     }
 }
 
-void MainWindow::on_buttonXSquared_released()
-{
-    // TODO x squared
-}
-
-void MainWindow::on_buttonSqrt_released()
-{
-    // TODO square root
-}
-
 /* Receives signal from Calculator that output of calculation is ready */
 void MainWindow::on_output_is_ready(QString output)
 {
+    // Reset state
     reset();
+
+    // Update result on screen
     input->setText(output);
 
-    // If user divided by zero, temporarily disable input after message
-    if(output == "No division by zero")
+    // If an error was encountered
+    if(output == "No division by zero" ||
+            output == "No negative radicands")
     {
         QApplication::processEvents();
         QThread::sleep(1);

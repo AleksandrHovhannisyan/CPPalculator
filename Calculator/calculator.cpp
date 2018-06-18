@@ -37,8 +37,15 @@ QStringList Calculator::scanInputAndGrabTokens()
             // If the digit is at the end of the input, push it
             if(i == input.length()-1) { tokens.push_back(runningToken); }
         }
-        // Operators
-        else if(operators.count(QString::QString(c)))
+        // Special case of root, two characters
+        else if(c == 'r')
+        {
+            tokens.push_back(runningToken);
+            runningToken = "";
+            tokens.push_back(c + input[++i]);
+        }
+        // Other operators
+        else if(c == 'r' || operators.count(QString::QString(c)))
         {
             tokens.push_back(runningToken);
             runningToken = "";
@@ -65,7 +72,6 @@ QStringList Calculator::scanInputAndGrabTokens()
 QString Calculator::evaluateInput(const QStringList &tokens)
 {
     QStack<double> operands;
-    bool divByZero = false;
 
     for(QStringList::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
     {
@@ -80,12 +86,18 @@ QString Calculator::evaluateInput(const QStringList &tokens)
             if(token == "+"){ operands.push(leftOperand+rightOperand); }
             else if(token == "-"){ operands.push(leftOperand-rightOperand); }
             else if(token == "×"){ operands.push(leftOperand*rightOperand); }
+            else if(token == "rt")
+            {
+                if(rightOperand < 0){ return "No negative radicands"; }
+                if(leftOperand == 0){ return "No division by zero"; }
+                else{ operands.push(std::pow(rightOperand, 1/leftOperand)); }
+            }
             else if(token == "÷")
             {
-                divByZero = (rightOperand == 0);
-                if(divByZero){ return "No division by zero"; }
-                operands.push(leftOperand/rightOperand);
+                if(rightOperand == 0){ return "No division by zero"; }
+                else{ operands.push(leftOperand/rightOperand); }
             }
+
         }
         // Number
         else { operands.push(token.toDouble()); }
