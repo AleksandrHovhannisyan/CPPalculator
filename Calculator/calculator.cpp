@@ -1,10 +1,11 @@
 #include "calculator.h"
+#include "operator.h"
+#include "utilityFunctions.h"
 #include <QDebug>
 #include <QStringList>
 #include <QString>
 #include <QStack>
 #include <sstream>
-#include "operator.h"
 
 /* MainWindow sends the input_is_ready() signal to
  * this slot to indicate that the user has provided
@@ -29,8 +30,8 @@ QStringList Calculator::scanInputAndGrabTokens()
     {
         QChar c = input[i];
 
-        // Digits
-        if(c.isDigit() || c == '.' || (c == '-' && i == 0))
+        // Digits, including decimals or negation
+        if(c.isDigit() || c == '.' || tokenIsNegation(c, input, i))
         {
             runningToken.append(c);
             // If the digit is at the end of the input, push it
@@ -78,7 +79,10 @@ double Calculator::evaluateInput(const QStringList &tokens)
             if(token == "+"){ operands.push(leftOperand+rightOperand); }
             else if(token == "-"){ operands.push(leftOperand-rightOperand); }
             else if(token == "×"){ operands.push(leftOperand*rightOperand); }
-            else if(token == "÷"){ operands.push(leftOperand/rightOperand); }       // TODO div by zero
+            else if(token == "÷")
+            {
+                operands.push(leftOperand/rightOperand);
+            }       // TODO div by zero
         }
         // Number
         else { operands.push(token.toDouble()); }
@@ -91,14 +95,6 @@ double Calculator::evaluateInput(const QStringList &tokens)
 void Calculator::run()
 {
     QStringList tokens = postfixConverter.convertToPostfix(scanInputAndGrabTokens());
-
-    // Uncomment for debugging
-    /*for(QStringList::Iterator it = tokens.begin(); it != tokens.end(); ++it)
-    {
-        qDebug() << (*it);
-    }
-    */
-
     QString answer = QString::number(evaluateInput(tokens));
     emit output_is_ready(answer);
 }

@@ -27,13 +27,15 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     calculator.cpp \
-    postfixconverter.cpp
+    postfixconverter.cpp \
+    utilityFunctions.cpp
 
 HEADERS += \
         mainwindow.h \
     calculator.h \
     postfixconverter.h \
-    operator.h
+    operator.h \
+    utilityFunctions.h
 
 FORMS += \
         mainwindow.ui

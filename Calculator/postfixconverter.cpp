@@ -3,7 +3,7 @@
 #include <QChar>
 
 
-/* Private helper. Checks if a token represents an integer.*/
+/* Private helper. Checks if a token represents a number. */
 bool PostfixConverter::isNumber(QString token)
 {
     // Negative numbers

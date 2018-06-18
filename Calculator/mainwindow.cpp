@@ -1,12 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "operator.h"
-#include <QDebug>               // debug output
+#include <QDebug>                        // debug output
 #include <QChar>
-#include <QShortcut>            // keyboard input
-#include <QKeySequence>         // keyboard input
-#include <QFont>                // Qt fonts
-
+#include <QShortcut>                     // keyboard input
+#include <QKeySequence>                  // keyboard input
+#include "utilityFunctions.h"            // custom commonly used functions
 
 /* Constructor for MainWindow objects. Connects all button signals
  * to their appropriate private slots to handle user input and sets
@@ -100,7 +99,7 @@ MainWindow::~MainWindow()
  */
 bool MainWindow::operatorUsedDirectlyBefore() const
 {
-    return ((bool)operators.count(input->text().at(input->text().length()-1)));
+    return (operators.count(input->text().at(input->text().length()-1)));
 }
 
 
@@ -161,7 +160,10 @@ void MainWindow::on_buttonNegate_released()
     int indexOfLastOperator = -1;
     for(int i = input->text().length() - 1; i >= 0; i--)
     {
-        if(operators.count(input->text().at(i)) == 1)
+        // Check that what we found is in fact an operator and not a negation
+        // (That's only ambiguous for subtraction)
+        QChar c = input->text().at(i);
+        if(operators.count(c) == 1 && !(tokenIsNegation(c, input->text(), i)))
         {
             inputHasOperators = true;
             indexOfLastOperator = i;
@@ -217,8 +219,6 @@ void MainWindow::on_buttonNegate_released()
     }
 }
 
-// TODO if we negate for example "1*-2", then it doesn't work because - is treated as an operator :(
-
 /* Called when a user clicks any binary operation's button
  * (+, -, *, /). Appends the corresponding operator to input.
  */
@@ -227,7 +227,16 @@ void MainWindow::on_binary_button_released()
     QPushButton *button = (QPushButton*)sender();
     State currentState = history.top();
 
-    if(currentState.operatorAllowed)
+    // This code handles negation in multiplication/division expressions via keyboard input
+    if(tokenIsNegation(button->text().at(0), input->text(), input->text().length()))
+    {
+        input->setText(input->text().append(button->text()));
+        history.push(State(true, true, true, false,
+                    currentState.numOpenParenths,
+                    currentState.numClosingParenths));
+    }
+    // All other cases of subtraction
+    else if(currentState.operatorAllowed)
     {
         input->setText(input->text().append(button->text()));
         history.push(State(true, false, true, false,
@@ -282,7 +291,7 @@ void MainWindow::on_buttonBack_released()
         input->setText("0");
     }
 
-    // Otherwise, if we have 2 or more entries, remove last char
+    // Otherwise, if we have 2 or more non-"0" entries, remove last char
     else
     {
         QString text = input->text();
@@ -341,6 +350,7 @@ void MainWindow::on_buttonSqrt_released()
     // TODO square root
 }
 
+/* Receives signal from Calculator that output of calculation is ready */
 void MainWindow::on_output_is_ready(QString output)
 {
     reset();
