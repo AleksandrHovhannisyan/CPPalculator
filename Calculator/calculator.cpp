@@ -1,6 +1,8 @@
 #include "calculator.h"
 #include <QDebug>
-#include <QstringList>
+#include <QStringList>
+#include <QString>
+#include <QStack>
 #include <sstream>
 #include "operator.h"
 
@@ -20,7 +22,6 @@ void Calculator::on_input_given(QString input)
  */
 QStringList Calculator::scanInputAndGrabTokens()
 {
-    qDebug() << "Input accepted and parsed to postfix.";
     QStringList tokens;
     QString runningToken = "";
 
@@ -29,9 +30,11 @@ QStringList Calculator::scanInputAndGrabTokens()
         QChar c = input[i];
 
         // Digits
-        if(c.isDigit() || c == '.' || c == '-')
+        if(c.isDigit() || c == '.')
         {
             runningToken.append(c);
+            // If the digit is at the end of the input, push it
+            if(i == input.length()-1) { tokens.push_back(runningToken); }
         }
         // Operators
         else if(operators.count(QString::QString(c)))
@@ -46,22 +49,52 @@ QStringList Calculator::scanInputAndGrabTokens()
             if(runningToken != ""){ tokens.push_back(runningToken); runningToken = ""; }
             tokens.push_back(QString::QString(c));
         }
+
+        qDebug() << "Running token: " << runningToken;
     }
 
     return tokens;
 }
 
+/* Calculates the floating-point value of the input. */
+double Calculator::evaluateInput(const QStringList &tokens)
+{
+    QStack<double> operands;
 
-/* Called as soon as input is ready for processing.
- */
+    for(QStringList::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
+    {
+        QString token = (*i);
+
+        // Operator
+        if(operators.count(token))
+        {
+            double rightOperand = operands.pop();
+            double leftOperand = operands.pop();
+
+            if(token == "+"){ operands.push(leftOperand+rightOperand); }
+            else if(token == "-"){ operands.push(leftOperand-rightOperand); }
+            else if(token == "×"){ operands.push(leftOperand*rightOperand); }
+            else if(token == "÷"){ operands.push(leftOperand/rightOperand); }       // TODO div by zero
+        }
+        // Number
+        else { operands.push(token.toDouble()); }
+    }
+
+    return operands.pop();
+}
+
+/* Called as soon as input is ready for processing. */
 void Calculator::run()
 {
     QStringList tokens = postfixConverter.convertToPostfix(scanInputAndGrabTokens());
 
     // Uncomment for debugging
-    for(QStringList::Iterator it = tokens.begin(); it != tokens.end(); ++it)
+    /*for(QStringList::Iterator it = tokens.begin(); it != tokens.end(); ++it)
     {
         qDebug() << (*it);
     }
+    */
 
+    QString answer = QString::number(evaluateInput(tokens));
+    emit output_is_ready(answer);
 }

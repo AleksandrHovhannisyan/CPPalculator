@@ -30,6 +30,11 @@ int main(int argc, char *argv[])
     // MainWindow signals Calculator when input is ready for processing
     QObject::connect(&window, SIGNAL(input_is_ready(QString)),
                      &calculator, SLOT(on_input_given(QString)));
+
+    // And Calculator signals MainWindow when output is ready for printing
+    QObject::connect(&calculator, SIGNAL(output_is_ready(QString)),
+                     &window, SLOT(on_output_is_ready(QString)));
+
     window.show();
     return app.exec();
 }

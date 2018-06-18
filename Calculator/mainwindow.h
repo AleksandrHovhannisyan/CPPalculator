@@ -50,6 +50,9 @@ private:
 signals:
     void input_is_ready(QString input);
 
+public slots:
+    void on_output_is_ready(QString output);
+
 private slots:
     void on_digit_released();
     void on_buttonDecimalPoint_released();

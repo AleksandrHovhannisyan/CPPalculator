@@ -34,8 +34,9 @@ QStringList PostfixConverter::convertToPostfix(const QStringList& input)
     {
         QString currentToken = input.at(index);
 
-        // Token is an integer
-        // TODO in the future, add "currentToken == "pi" || currentToken == "e" ||" to the check
+        // TODO negatives not working because they have the same symbol as subtraction, fml
+
+        // Token is a number
         if(isNumber(currentToken))
         {
             output.push_back(currentToken);

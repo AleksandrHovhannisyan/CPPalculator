@@ -334,3 +334,9 @@ void MainWindow::on_buttonSqrt_released()
 {
     // TODO square root
 }
+
+void MainWindow::on_output_is_ready(QString output)
+{
+    reset();
+    input->setText(output);
+}

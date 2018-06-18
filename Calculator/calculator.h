@@ -21,10 +21,10 @@ public slots:
 
 public:
     void run();
+    double evaluateInput(const QStringList &tokens);
 
 private:
     QString input;
-    QString output;
     PostfixConverter postfixConverter;
     QStringList scanInputAndGrabTokens();
 };
