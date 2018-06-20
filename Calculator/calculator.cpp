@@ -45,7 +45,7 @@ QStringList Calculator::scanInputAndGrabTokens()
             tokens.push_back(c + input[++i]);
         }
         // Other operators
-        else if(c == 'r' || operators.count(QString::QString(c)))
+        else if(isOperator(QString::QString(c)))
         {
             tokens.push_back(runningToken);
             runningToken = "";
@@ -54,7 +54,8 @@ QStringList Calculator::scanInputAndGrabTokens()
         // Parentheses
         else if(c == '(' || c == ')')
         {
-            if(runningToken != ""){ tokens.push_back(runningToken); runningToken = ""; }
+            // Have to do the != "-" check in case we have something like 5 * -(2)
+            if(runningToken != "" && runningToken != "-"){ tokens.push_back(runningToken); runningToken = ""; }
             tokens.push_back(QString::QString(c));
         }
     }
@@ -77,8 +78,13 @@ QString Calculator::evaluateInput(const QStringList &tokens)
     {
         QString token = (*i);
 
+        // Number
+        if(isNumber(token))
+        {
+            operands.push(token.toDouble());
+        }
         // Operator
-        if(operators.count(token))
+        else
         {
             double rightOperand = operands.pop();
             double leftOperand = operands.pop();
@@ -86,9 +92,9 @@ QString Calculator::evaluateInput(const QStringList &tokens)
             if(token == "+"){ operands.push(leftOperand+rightOperand); }
             else if(token == "-"){ operands.push(leftOperand-rightOperand); }
             else if(token == "×"){ operands.push(leftOperand*rightOperand); }
+            else if(token == "^"){ operands.push(std::pow(leftOperand, rightOperand)); }
             else if(token == "rt")
             {
-                if(rightOperand < 0){ return "No negative radicands"; }
                 if(leftOperand == 0){ return "No division by zero"; }
                 else{ operands.push(std::pow(rightOperand, 1/leftOperand)); }
             }
@@ -99,8 +105,6 @@ QString Calculator::evaluateInput(const QStringList &tokens)
             }
 
         }
-        // Number
-        else { operands.push(token.toDouble()); }
     }
 
     return QString::number(operands.pop());
@@ -110,6 +114,13 @@ QString Calculator::evaluateInput(const QStringList &tokens)
 void Calculator::run()
 {
     QStringList tokens = postfixConverter.convertToPostfix(scanInputAndGrabTokens());
+
+    qDebug() << "Postfix choo choo!!";
+    for(int i = 0; i < tokens.size(); i++)
+    {
+        qDebug() << tokens[i];
+    }
+
     QString answer = evaluateInput(tokens);
     emit output_is_ready(answer);
 }

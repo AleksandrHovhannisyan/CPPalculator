@@ -19,11 +19,13 @@ void setUpOperators()
     Operator times(Left, 2);
     Operator divide(Left, 2);
     Operator root(Right, 3);
+    Operator pow(Right, 3);
     operators["+"] = plus;
     operators["-"] = minus;
     operators["×"] = times;
     operators["÷"] = divide;
     operators["rt"] = root;
+    operators["^"] = pow;
 }
 
 int main(int argc, char *argv[])

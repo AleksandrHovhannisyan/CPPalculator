@@ -46,9 +46,10 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_binary_button_released()));
     connect(ui->buttonRoot, SIGNAL(released()),
             this, SLOT(on_binary_button_released()));
+    connect(ui->buttonPow, SIGNAL(released()),
+            this, SLOT(on_binary_button_released()));
 
     // Shortcuts for math input via keyboard
-    // TODO potential memory leaks
     QShortcut *shortcut0 = new QShortcut(QKeySequence("0"), this);
     QShortcut *shortcut1 = new QShortcut(QKeySequence("1"), this);
     QShortcut *shortcut2 = new QShortcut(QKeySequence("2"), this);
@@ -71,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QShortcut *shortcutBackspace = new QShortcut(QKeySequence("Backspace"), this);
     QShortcut *shortcutClear = new QShortcut(QKeySequence("Delete"), this);
     QShortcut *shortcutRoot = new QShortcut(QKeySequence(Qt::Key_R), this);
+    QShortcut *shortcutPow = new QShortcut(QKeySequence("SHIFT+6"), this);
     connect(shortcut0, SIGNAL(activated()), ui->button0, SLOT(click()));
     connect(shortcut1, SIGNAL(activated()), ui->button1, SLOT(click()));
     connect(shortcut2, SIGNAL(activated()), ui->button2, SLOT(click()));
@@ -93,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(shortcutEnter2, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
     connect(shortcutBackspace, SIGNAL(activated()), ui->buttonBack, SLOT(click()));
     connect(shortcutClear, SIGNAL(activated()), ui->buttonClear, SLOT(click()));
+    connect(shortcutPow, SIGNAL(activated()), ui->buttonPow, SLOT(click()));
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +109,7 @@ MainWindow::~MainWindow()
  */
 bool MainWindow::operatorUsedDirectlyBefore() const
 {
-    return (operators.count(input->text().at(input->text().length()-1)));
+    return isOperator(input->text().at(input->text().length()-1));
 }
 
 
@@ -172,7 +175,8 @@ void MainWindow::on_buttonNegate_released()
         // Check that what we found is in fact an operator and not a negation
         // (That's only ambiguous for subtraction)
         QChar c = input->text().at(i);
-        if((operators.count(c) == 1 || c == 'r' || c == 't') && !(tokenIsNegation(c, input->text(), i)))
+        if((isOperator(c) || c == 'r' || c == 't' || c == '(') &&
+                !(tokenIsNegation(c, input->text(), i)))
         {
             inputHasOperators = true;
             indexOfLastOperator = i;
@@ -354,8 +358,7 @@ void MainWindow::on_output_is_ready(QString output)
     input->setText(output);
 
     // If an error was encountered
-    if(output == "No division by zero" ||
-            output == "No negative radicands")
+    if(output == "No division by zero")
     {
         QApplication::processEvents();
         QThread::sleep(1);

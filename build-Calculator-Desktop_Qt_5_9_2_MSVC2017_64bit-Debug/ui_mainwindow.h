@@ -42,7 +42,7 @@ public:
     QPushButton *buttonTimes;
     QPushButton *buttonDivide;
     QPushButton *buttonRoot;
-    QPushButton *buttonSquared;
+    QPushButton *buttonPow;
     QPushButton *buttonClear;
     QLabel *labelInput;
     QPushButton *buttonNegate;
@@ -156,11 +156,11 @@ public:
         buttonRoot->setObjectName(QStringLiteral("buttonRoot"));
         buttonRoot->setGeometry(QRect(10, 130, 91, 51));
         buttonRoot->setFont(font);
-        buttonSquared = new QPushButton(centralWidget);
-        buttonGroup->addButton(buttonSquared);
-        buttonSquared->setObjectName(QStringLiteral("buttonSquared"));
-        buttonSquared->setGeometry(QRect(110, 130, 91, 51));
-        buttonSquared->setFont(font);
+        buttonPow = new QPushButton(centralWidget);
+        buttonGroup->addButton(buttonPow);
+        buttonPow->setObjectName(QStringLiteral("buttonPow"));
+        buttonPow->setGeometry(QRect(110, 130, 91, 51));
+        buttonPow->setFont(font);
         buttonClear = new QPushButton(centralWidget);
         buttonGroup->addButton(buttonClear);
         buttonClear->setObjectName(QStringLiteral("buttonClear"));
@@ -235,7 +235,7 @@ public:
         buttonTimes->setText(QApplication::translate("MainWindow", "\303\227", Q_NULLPTR));
         buttonDivide->setText(QApplication::translate("MainWindow", "\303\267", Q_NULLPTR));
         buttonRoot->setText(QApplication::translate("MainWindow", "rt", Q_NULLPTR));
-        buttonSquared->setText(QApplication::translate("MainWindow", "^", Q_NULLPTR));
+        buttonPow->setText(QApplication::translate("MainWindow", "^", Q_NULLPTR));
         buttonClear->setText(QApplication::translate("MainWindow", "Clear", Q_NULLPTR));
         labelInput->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
         buttonNegate->setText(QApplication::translate("MainWindow", "\302\261", Q_NULLPTR));

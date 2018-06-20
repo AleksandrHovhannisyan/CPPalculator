@@ -18,9 +18,6 @@ public:
 
 private:
     QStringList output;
-
-    bool isNumber(QString token);
-    bool isOperator(QString token){ return operators.count(token) == 1; }
     void popOperator(QStack<QString>& operatorStack);
 };
 

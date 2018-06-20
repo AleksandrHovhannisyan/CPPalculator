@@ -389,7 +389,7 @@
      <string notr="true">buttonGroup</string>
     </attribute>
    </widget>
-   <widget class="QPushButton" name="buttonSquared">
+   <widget class="QPushButton" name="buttonPow">
     <property name="geometry">
      <rect>
       <x>110</x>

@@ -11,4 +11,10 @@
  */
 bool tokenIsNegation(QChar token, QString context, int i);
 
+/* Returns true if a token is a valid operator. */
+bool isOperator(QString token);
+
+/* Returns true if a token is a valid number. */
+bool isNumber(QString token);
+
 #endif // UTILITY_H

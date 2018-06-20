@@ -1,23 +1,8 @@
 #include "postfixconverter.h"
+#include "utilityFunctions.h"
 #include <QStack>
 #include <QChar>
 
-
-/* Private helper. Checks if a token represents a number. */
-bool PostfixConverter::isNumber(QString token)
-{
-    // Negative numbers
-    if(token.at(0) == '-' && token.length() > 1) { return true; }
-
-    // All others
-    for(int i = 0; i < token.length(); i++)
-    {
-        QChar currentCharacter = token.at(i);
-        if(!currentCharacter.isDigit() && currentCharacter != '.') { return false; }
-    }
-
-    return true;
-}
 
 /* Parses an infix mathematical expression to postfix notation
  * using the Shunting-yard algorithm. Returns the list of tokens.
