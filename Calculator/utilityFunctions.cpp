@@ -1,11 +1,23 @@
-#include "utilityFunctions.h"
+﻿#include "utilityFunctions.h"
 #include "operator.h"
 
+
+/* A token is a negation operator if it's an initial negative sign
+ * or a negative sign that follows some other operator, like a
+ * multiplication, division, or exponentiation, or if it follows an
+ * opening parenthesis.
+*/
 bool tokenIsNegation(QChar c, QString context, int i)
 {
-    QString prev = context[i-1];
-    return (c == '-' &&
-                (i == 0 || prev == "×" || prev == "÷" || prev == "^" || prev == "("));
+    bool negativeSign = (c == '-');
+    bool initialNegative = (i == 0 && negativeSign);
+    bool previousIsOperator = (i >= 1 && (context[i-1] == "×" ||
+                               context[i-1] == "÷" ||
+                               context[i-1] == "^" ||
+                               context[i-1] == "("));
+    bool other = (negativeSign && previousIsOperator);
+
+    return initialNegative || other;
 }
 
 bool isOperator(QString token)

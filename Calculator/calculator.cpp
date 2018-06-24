@@ -1,11 +1,10 @@
-#include "calculator.h"
+﻿#include "calculator.h"
 #include "operator.h"
 #include "utilityFunctions.h"
 #include <QDebug>
 #include <QStringList>
 #include <QString>
 #include <QStack>
-#include <sstream>
 
 /* MainWindow sends the input_is_ready() signal to
  * this slot to indicate that the user has provided
@@ -44,27 +43,37 @@ QStringList Calculator::scanInputAndGrabTokens()
             runningToken = "";
             tokens.push_back(c + input[++i]);
         }
-        // Other operators
-        else if(isOperator(QString::QString(c)))
+        // Square root character
+        else if (c == 0x221a)
         {
-            tokens.push_back(runningToken);
-            runningToken = "";
+            // Because sqrt is essentially (2)rt(x)
+            input.replace(i, 1, "");
+            input.insert(i, "2rt");
+            // To read the 2 after i increments at end of iteration
+            i--;
+        }
+        // Other operators
+        else if(isOperator(c))
+        {
+            if(runningToken != ""){ tokens.push_back(runningToken); runningToken = ""; }
             tokens.push_back(QString::QString(c));
         }
         // Parentheses
         else if(c == '(' || c == ')')
         {
-            // Have to do the != "-" check in case we have something like 5 * -(2)
+            // Have to do the != "-" check in case we have something like 5*-(2)
             if(runningToken != "" && runningToken != "-"){ tokens.push_back(runningToken); runningToken = ""; }
             tokens.push_back(QString::QString(c));
         }
     }
 
+    /* // Uncomment to debug
     qDebug() << "----------------INPUT TOKENS-------------------";
     for(int i = 0; i < tokens.size(); i++)
     {
         qDebug() << tokens[i];
     }
+    */
 
     return tokens;
 }
@@ -96,6 +105,7 @@ QString Calculator::evaluateInput(const QStringList &tokens)
             else if(token == "rt")
             {
                 if(leftOperand == 0){ return "No division by zero"; }
+                else if(rightOperand < 0){ return "No negative radicands"; }
                 else{ operands.push(std::pow(rightOperand, 1/leftOperand)); }
             }
             else if(token == "÷")
@@ -115,7 +125,7 @@ void Calculator::run()
 {
     QStringList tokens = postfixConverter.convertToPostfix(scanInputAndGrabTokens());
 
-    qDebug() << "Postfix choo choo!!";
+    //qDebug() << "Postfix choo choo!!";
     for(int i = 0; i < tokens.size(); i++)
     {
         qDebug() << tokens[i];

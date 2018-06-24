@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "operator.h"
 #include "utilityFunctions.h"           // custom commonly used functions
@@ -49,6 +49,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buttonPow, SIGNAL(released()),
             this, SLOT(on_binary_button_released()));
 
+    // Unary buttons
+    connect(ui->buttonSqrt, SIGNAL(released()),
+            this, SLOT(on_unaryButton_released()));
+    connect(ui->buttonNegate, SIGNAL(released()),
+            this, SLOT(on_unaryButton_released()));
+    connect(ui->buttonXSquared, SIGNAL(released()),
+            this, SLOT(on_unaryButton_released()));
+
     // Shortcuts for math input via keyboard
     QShortcut *shortcut0 = new QShortcut(QKeySequence("0"), this);
     QShortcut *shortcut1 = new QShortcut(QKeySequence("1"), this);
@@ -72,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QShortcut *shortcutBackspace = new QShortcut(QKeySequence("Backspace"), this);
     QShortcut *shortcutClear = new QShortcut(QKeySequence("Delete"), this);
     QShortcut *shortcutRoot = new QShortcut(QKeySequence(Qt::Key_R), this);
+    QShortcut *shortcutSqrt = new QShortcut(QKeySequence(Qt::Key_S), this);
     QShortcut *shortcutPow = new QShortcut(QKeySequence("SHIFT+6"), this);
     connect(shortcut0, SIGNAL(activated()), ui->button0, SLOT(click()));
     connect(shortcut1, SIGNAL(activated()), ui->button1, SLOT(click()));
@@ -90,11 +99,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(shortcutDivide, SIGNAL(activated()), ui->buttonDivide, SLOT(click()));
     connect(shortcutOpenParenth, SIGNAL(activated()), ui->buttonOpenParenth, SLOT(click()));
     connect(shortcutCloseParenth, SIGNAL(activated()), ui->buttonCloseParenth, SLOT(click()));
-    connect(shortcutRoot, SIGNAL(activated()), ui->buttonRoot, SLOT(click()));
     connect(shortcutEnter1, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
     connect(shortcutEnter2, SIGNAL(activated()), ui->buttonEquals, SLOT(click()));
     connect(shortcutBackspace, SIGNAL(activated()), ui->buttonBack, SLOT(click()));
     connect(shortcutClear, SIGNAL(activated()), ui->buttonClear, SLOT(click()));
+    connect(shortcutRoot, SIGNAL(activated()), ui->buttonRoot, SLOT(click()));
+    connect(shortcutSqrt, SIGNAL(activated()), ui->buttonSqrt, SLOT(click()));
     connect(shortcutPow, SIGNAL(activated()), ui->buttonPow, SLOT(click()));
 }
 
@@ -157,78 +167,102 @@ void MainWindow::on_buttonDecimalPoint_released()
     }
 }
 
-/* Called when a user clicks the '±' button. Negates an input expression.
- * Applies the negative sign to the last number entered (if one exists).
- * Negating a negative number will remove the negative sign. Negating the
- * right operand of addition will change the '+' operator to subtraction.
- * Similarly, negating the right operand of subtraction will change the
- * '-' operator to addition.
+/* Called when a user clicks a unary button. The unary
+ * buttons for this calculator are +/, sqrt, and x^2.
  */
-void MainWindow::on_buttonNegate_released()
+void MainWindow::on_unaryButton_released()
 {
-    // Check if there are currently any operators in input
-    bool inputHasOperators = false;
-    // If so, get the index of the last one (hence reverse traversal)
-    int indexOfLastOperator = -1;
-    for(int i = input->text().length() - 1; i >= 0; i--)
+    QChar op = QChar::QChar(((QPushButton*)sender())->text().at(0));
+    State currentState = history.top();
+
+    // ---------------------- NEGATION OPERATOR ----------------------
+    if(op == 0x00b1)
     {
-        // Check that what we found is in fact an operator and not a negation
-        // (That's only ambiguous for subtraction)
-        QChar c = input->text().at(i);
-        if((isOperator(c) || c == 'r' || c == 't' || c == '(') &&
-                !(tokenIsNegation(c, input->text(), i)))
+        // Check if there are currently any operators in input
+        bool inputHasOperators = false;
+
+        // If so, get the index of the last one (hence reverse traversal)
+        int indexOfLastOperator = -1;
+
+        for(int i = input->text().length() - 1; i >= 0; i--)
         {
-            inputHasOperators = true;
-            indexOfLastOperator = i;
-            break;
-        }
-    }
-
-    // If we entered an operator and then tried to negate something
-    if(indexOfLastOperator == input->text().length()-1){ return; }
-
-    // Case 1: Input contains operators
-    if(inputHasOperators)
-    {
-        QChar lastOperator = input->text().at(indexOfLastOperator);
-
-        // If the number in question is already negative, undo it
-        if(input->text().at(indexOfLastOperator+1) == '-')
-        {
-            input->setText(input->text().replace(indexOfLastOperator+1, 1, ""));
+            // Check that what we found is in fact an operator and not a negation
+            // (That's only ambiguous for subtraction)
+            QChar c = input->text().at(i);
+            if((isOperator(c) || c == 'r' || c == 't' || c == '(') &&
+                    !(tokenIsNegation(c, input->text(), i)))
+            {
+                inputHasOperators = true;
+                indexOfLastOperator = i;
+                break;
+            }
         }
 
-        // If not, let's check what kind of operator came before it
-        else
+        // If user entered an operator and then tried to negate something
+        if(indexOfLastOperator == input->text().length()-1){ return; }
+
+        // Case 1: Input contains operators
+        if(inputHasOperators)
         {
-            // If it was a plus, change that to a minus
-            if(lastOperator == '+')
+            QChar lastOperator = input->text().at(indexOfLastOperator);
+
+            // If the number in question is already negative, undo it
+            if(input->text().at(indexOfLastOperator+1) == '-')
             {
-                input->setText(input->text().replace(indexOfLastOperator, 1, "-"));
+                input->setText(input->text().replace(indexOfLastOperator+1, 1, ""));
             }
-            // If it was a minus, change that to a plus
-            else if(lastOperator == '-')
-            {
-                input->setText(input->text().replace(indexOfLastOperator, 1, "+"));
-            }
-            // Otherwise, just negate the last number
+
+            // If not, let's check what kind of operator came before it
             else
             {
-                input->setText(input->text().insert(indexOfLastOperator+1, '-'));
+                // If it was a plus, change that to a minus
+                if(lastOperator == '+')
+                {
+                    input->setText(input->text().replace(indexOfLastOperator, 1, "-"));
+                }
+                // If it was a minus, change that to a plus
+                else if(lastOperator == '-')
+                {
+                    input->setText(input->text().replace(indexOfLastOperator, 1, "+"));
+                }
+                // Otherwise, just negate the last number
+                else
+                {
+                    input->setText(input->text().insert(indexOfLastOperator+1, '-'));
+                }
             }
+        }
+
+        // Case 2: No operators and already negative number
+        else if(input->text().at(0) == '-')
+        {
+            input->setText(input->text().replace(0, 1, ""));
+        }
+
+        // Case 3: No operators and positive number
+        else
+        {
+            input->setText(input->text().prepend("-"));
         }
     }
 
-    // Case 2: No operators and already negative number
-    else if(input->text().at(0) == '-')
+    // ---------------------- SQUARE ROOT OPERATOR -----------------------
+    else if(op == 0x221a)
     {
-        input->setText(input->text().replace(0, 1, ""));
+        if(input->text() == "0"){ input->setText(op); }
+        else{ input->setText(input->text().append(op)); }
+        history.push(State(true, false, true, true, false,
+                    currentState.numOpenParenths,
+                    currentState.numClosingParenths));
     }
 
-    // Case 3: No operators and positive number
-    else
+    // // ---------------------- X SQUARED OPERATOR ----------------------
+    else if(op == 'x')
     {
-        input->setText(input->text().prepend("-"));
+        input->setText(input->text().append("^2"));
+        history.push(State(true, true, true, false, true,
+                                history.top().numOpenParenths,
+                                history.top().numClosingParenths));
     }
 }
 
@@ -280,7 +314,7 @@ void MainWindow::reset()
 {
     input->setText("0");
     history.clear();
-    history.push(State(true, true, true, false, false));
+    history.push(State(true, true, true, true, false));
 }
 
 /* Called when a user clicks the 'Clear' button or uses the keyboard
@@ -323,7 +357,15 @@ void MainWindow::on_buttonOpenParenth_released()
 {
     if(history.top().openParenthAllowed)
     {
-        input->setText(input->text().append("("));
+        if(input->text() == "0")
+        {
+            input->setText("(");
+        }
+        else if(!isdigit(input->text().at(input->text().length()-1).toLatin1()))
+        {
+            input->setText(input->text().append("("));
+        }
+
         history.push(State(true, false, true, true, false,
                            history.top().numOpenParenths+1,
                            history.top().numClosingParenths));
@@ -358,7 +400,7 @@ void MainWindow::on_output_is_ready(QString output)
     input->setText(output);
 
     // If an error was encountered
-    if(output == "No division by zero")
+    if(output == "No division by zero" || output == "No negative radicands")
     {
         QApplication::processEvents();
         QThread::sleep(1);

@@ -62,7 +62,7 @@ public slots:
 private slots:
     void on_digit_released();
     void on_buttonDecimalPoint_released();
-    void on_buttonNegate_released();
+    void on_unaryButton_released();
     void on_binary_button_released();
     void on_buttonEquals_released();
     void on_buttonClear_released();

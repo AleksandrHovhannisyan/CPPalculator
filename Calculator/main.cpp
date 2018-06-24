@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <QApplication>
 #include "calculator.h"
 #include "operator.h"   // for global "operators" map (see below for def)
@@ -20,6 +20,7 @@ void setUpOperators()
     Operator divide(Left, 2);
     Operator root(Right, 3);
     Operator pow(Right, 3);
+
     operators["+"] = plus;
     operators["-"] = minus;
     operators["×"] = times;
