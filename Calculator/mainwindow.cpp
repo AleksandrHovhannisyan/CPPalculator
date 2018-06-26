@@ -249,11 +249,25 @@ void MainWindow::on_unaryButton_released()
     // ---------------------- SQUARE ROOT OPERATOR -----------------------
     else if(op == 0x221a)
     {
-        if(input->text() == "0"){ input->setText(op); }
-        else{ input->setText(input->text().append(op)); }
-        history.push(State(true, false, true, true, false,
-                    currentState.numOpenParenths,
-                    currentState.numClosingParenths));
+        bool inputChanged = false;
+
+        if(input->text() == "0")
+        {
+            input->setText(op);
+            inputChanged = true;
+        }
+        else if(!isdigit(input->text()[input->text().length()-1].toLatin1()))
+        {
+            input->setText(input->text().append(op));
+            inputChanged = true;
+        }
+
+        if(inputChanged)
+        {
+            history.push(State(true, false, true, true, false,
+                        currentState.numOpenParenths,
+                        currentState.numClosingParenths));
+        }
     }
 
     // // ---------------------- X SQUARED OPERATOR ----------------------
