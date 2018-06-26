@@ -29,6 +29,12 @@ QStringList Calculator::scanInputAndGrabTokens()
     {
         QChar c = input[i];
 
+        /* // Uncomment to debug
+        qDebug() << "Character: " << c;
+        qDebug() << "As a string: " << QString::QString(c);
+        qDebug() << "Running token: " << runningToken;
+        */
+
         // Digits, including decimals or negation
         if(c.isDigit() || c == '.' || tokenIsNegation(c, input, i))
         {
@@ -53,7 +59,7 @@ QStringList Calculator::scanInputAndGrabTokens()
             i--;
         }
         // Other operators
-        else if(isOperator(c))
+        else if(isOperator(QString::QString(c)))
         {
             if(runningToken != ""){ tokens.push_back(runningToken); runningToken = ""; }
             tokens.push_back(QString::QString(c));
@@ -98,17 +104,17 @@ QString Calculator::evaluateInput(const QStringList &tokens)
             double rightOperand = operands.pop();
             double leftOperand = operands.pop();
 
-            if(token == "+"){ operands.push(leftOperand+rightOperand); }
-            else if(token == "-"){ operands.push(leftOperand-rightOperand); }
-            else if(token == "×"){ operands.push(leftOperand*rightOperand); }
-            else if(token == "^"){ operands.push(std::pow(leftOperand, rightOperand)); }
-            else if(token == "rt")
+            if(token == ADD){ operands.push(leftOperand+rightOperand); }
+            else if(token == SUB){ operands.push(leftOperand-rightOperand); }
+            else if(token == MULT){ operands.push(leftOperand*rightOperand); }
+            else if(token == EXP){ operands.push(std::pow(leftOperand, rightOperand)); }
+            else if(token == ROOT)
             {
                 if(leftOperand == 0){ return "No division by zero"; }
                 else if(rightOperand < 0){ return "No negative radicands"; }
                 else{ operands.push(std::pow(rightOperand, 1/leftOperand)); }
             }
-            else if(token == "÷")
+            else if(token == DIV)
             {
                 if(rightOperand == 0){ return "No division by zero"; }
                 else{ operands.push(leftOperand/rightOperand); }
@@ -125,11 +131,13 @@ void Calculator::run()
 {
     QStringList tokens = postfixConverter.convertToPostfix(scanInputAndGrabTokens());
 
-    //qDebug() << "Postfix choo choo!!";
+    // Uncomment to debug
+    /* qDebug() << "Postfix choo choo!!";
     for(int i = 0; i < tokens.size(); i++)
     {
         qDebug() << tokens[i];
     }
+    */
 
     QString answer = evaluateInput(tokens);
     emit output_is_ready(answer);

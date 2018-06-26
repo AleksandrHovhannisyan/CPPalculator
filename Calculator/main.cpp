@@ -14,19 +14,19 @@ QMap<QString, Operator> operators;
  */
 void setUpOperators()
 {
-    Operator plus(Left, 1);
-    Operator minus(Left, 1);
-    Operator times(Left, 2);
+    Operator add(Left, 1);
+    Operator subtract(Left, 1);
+    Operator multiply(Left, 2);
     Operator divide(Left, 2);
     Operator root(Right, 3);
-    Operator pow(Right, 3);
+    Operator exp(Right, 3);
 
-    operators["+"] = plus;
-    operators["-"] = minus;
-    operators["×"] = times;
-    operators["÷"] = divide;
-    operators["rt"] = root;
-    operators["^"] = pow;
+    operators[ADD] = add;
+    operators[SUB] = subtract;
+    operators[MULT] = multiply;
+    operators[DIV] = divide;
+    operators[ROOT] = root;
+    operators[EXP] = exp;
 }
 
 int main(int argc, char *argv[])

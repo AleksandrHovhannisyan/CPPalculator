@@ -11,18 +11,18 @@ bool tokenIsNegation(QChar c, QString context, int i)
 {
     bool negativeSign = (c == '-');
     bool initialNegative = (i == 0 && negativeSign);
-    bool previousIsOperator = (i >= 1 && (context[i-1] == "×" ||
-                               context[i-1] == "÷" ||
-                               context[i-1] == "^" ||
+    bool previousIsMultOpOrParenth = (i >= 1 && (context[i-1] == MULT ||
+                               context[i-1] == DIV ||
+                               context[i-1] == EXP ||
                                context[i-1] == "("));
-    bool other = (negativeSign && previousIsOperator);
+    bool other = (negativeSign && previousIsMultOpOrParenth);
 
     return initialNegative || other;
 }
 
 bool isOperator(QString token)
 {
-    return operators.count(token);
+    return operators.contains(token);
 }
 
 bool isNumber(QString token)

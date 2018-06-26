@@ -218,17 +218,17 @@ void MainWindow::on_unaryButton_released()
                 // If it was a plus, change that to a minus
                 if(lastOperator == '+')
                 {
-                    input->setText(input->text().replace(indexOfLastOperator, 1, "-"));
+                    input->setText(input->text().replace(indexOfLastOperator, 1, SUB));
                 }
                 // If it was a minus, change that to a plus
                 else if(lastOperator == '-')
                 {
-                    input->setText(input->text().replace(indexOfLastOperator, 1, "+"));
+                    input->setText(input->text().replace(indexOfLastOperator, 1, ADD));
                 }
                 // Otherwise, just negate the last number
                 else
                 {
-                    input->setText(input->text().insert(indexOfLastOperator+1, '-'));
+                    input->setText(input->text().insert(indexOfLastOperator+1, SUB));
                 }
             }
         }
@@ -242,7 +242,7 @@ void MainWindow::on_unaryButton_released()
         // Case 3: No operators and positive number
         else
         {
-            input->setText(input->text().prepend("-"));
+            input->setText(input->text().prepend(SUB));
         }
     }
 
@@ -273,22 +273,33 @@ void MainWindow::on_binary_button_released()
 {
     QPushButton *button = (QPushButton*)sender();
     State currentState = history.top();
+    bool inputAltered = false;
 
     // This code handles negation in multiplication/division expressions via keyboard input
     if(tokenIsNegation(button->text().at(0), input->text(), input->text().length()))
     {
         input->setText(input->text().append(button->text()));
-        history.push(State(true, false, true, true, false,
-                    currentState.numOpenParenths,
-                    currentState.numClosingParenths));
+        inputAltered = true;
     }
-    // All other cases of subtraction
+    else if(button->text() == "-" && input->text() == "0")
+    {
+        input->setText("-");
+        inputAltered = true;
+    }
+    // All other cases of operators, if one is allowed
     else if(currentState.operatorAllowed)
     {
         input->setText(input->text().append(button->text()));
+        inputAltered = true;
+    }
+
+    // To avoid repeating this code block, and this should only be inserted
+    // if we actually altered the input, not on every call to this function
+    if(inputAltered)
+    {
         history.push(State(true, false, true, true, false,
-                           currentState.numOpenParenths,
-                           currentState.numClosingParenths));
+                    currentState.numOpenParenths,
+                    currentState.numClosingParenths));
     }
 }
 
