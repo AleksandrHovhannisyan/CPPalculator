@@ -136,8 +136,8 @@ void MainWindow::on_digit_released()
         QPushButton *button = (QPushButton*)sender();
 
         history.push(State(true, true, true, false, true,
-                                history.top().numOpenParenths,
-                                history.top().numClosingParenths));
+                                currentState.numOpenParenths,
+                                currentState.numClosingParenths));
 
         // Initial input is just a 0, so check for that case
         if(input->text().length() == 1 && input->text()[0] == '0')
@@ -158,12 +158,14 @@ void MainWindow::on_digit_released()
  */
 void MainWindow::on_buttonDecimalPoint_released()
 {
-    if(history.top().decimalAllowed)
+    State currentState = history.top();
+
+    if(currentState.decimalAllowed)
     {
         input->setText(input->text() + ".");
         history.push(State(true, true, false, false, true,
-                                history.top().numOpenParenths,
-                                history.top().numClosingParenths));
+                                currentState.numOpenParenths,
+                                currentState.numClosingParenths));
     }
 }
 
@@ -275,8 +277,8 @@ void MainWindow::on_unaryButton_released()
     {
         input->setText(input->text().append("^2"));
         history.push(State(true, true, true, false, true,
-                                history.top().numOpenParenths,
-                                history.top().numClosingParenths));
+                                currentState.numOpenParenths,
+                                currentState.numClosingParenths));
     }
 }
 
@@ -380,7 +382,9 @@ void MainWindow::on_buttonBack_released()
  */
 void MainWindow::on_buttonOpenParenth_released()
 {
-    if(history.top().openParenthAllowed)
+    State currentState = history.top();
+
+    if(currentState.openParenthAllowed)
     {
         if(input->text() == "0")
         {
@@ -392,8 +396,8 @@ void MainWindow::on_buttonOpenParenth_released()
         }
 
         history.push(State(true, false, true, true, false,
-                           history.top().numOpenParenths+1,
-                           history.top().numClosingParenths));
+                           currentState.numOpenParenths+1,
+                           currentState.numClosingParenths));
     }
 }
 
@@ -410,16 +414,17 @@ void MainWindow::on_buttonCloseParenth_released()
     {
         input->setText(input->text().append(")"));
         history.push(State(false, true, false, false, true,
-                           history.top().numOpenParenths,
-                           history.top().numClosingParenths+1));
+                           currentState.numOpenParenths,
+                           currentState.numClosingParenths+1));
     }
 }
 
 /* Receives signal from Calculator that output of calculation is ready */
 void MainWindow::on_output_is_ready(QString output)
 {
-    // Reset state
-    reset();
+    // Apply same restrictions as when there's a number in input queue
+    history.clear();
+    history.push(State(false, true, true, false, false));
 
     // Update result on screen
     input->setText(output);
