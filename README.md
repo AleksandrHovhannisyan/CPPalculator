@@ -1,6 +1,6 @@
 # CPPalculator
 
-A simple calculator app for intuitive, nested input. Evaluates are performed using postfix notation.
+A simple calculator app for intuitive, nested input. Evaluations are performed using postfix notation.
 
 Pardon the title and my lack of creativity :)
 
