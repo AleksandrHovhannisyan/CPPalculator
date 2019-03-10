@@ -1,10 +1,8 @@
 # CPPalculator
-Pardon the title and my lack of creativity, lol.
 
-### Motivation
-Currently, this project is purely intended for practicing Qt and C++ programming. The calculator
-app is a GUI extension of a postfix calculator that I wrote for a programming fundamentals course 
-project early in my major at the University of Florida.
+A simple calculator app for intuitive, nested input. Evaluates are performed using postfix notation.
+
+Pardon the title and my lack of creativity :)
 
 ### Resources and Related Materials
 - [Shunting-yard algorithm](https://en.wikipedia.org/wiki/Shunting-yard_algorithm)
